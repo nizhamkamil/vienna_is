@@ -13,47 +13,33 @@ class LandingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    int crossAxisCount;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double childAspect = MediaQuery.of(context).size.width;
+
+    if (screenWidth >= 1600) {
+      crossAxisCount = 3;
+    } else if (screenWidth >= 1400) {
+      crossAxisCount = 2;
+    } else if (screenWidth >= 800) {
+      crossAxisCount = 1;
+    } else {
+      crossAxisCount = 1;
+    }
+
+    if (childAspect >= 1600) {
+      childAspect = 8 / 10;
+    } else if (childAspect >= 1400) {
+      childAspect = 9 / 10;
+    } else if (childAspect >= 800) {
+      childAspect = 9 / 10;
+    } else {
+      childAspect = 6 / 10;
+    }
+
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: kBrownGoldColor,
-          title: Padding(
-            padding: EdgeInsets.only(left: Get.width * 0.05),
-            child: const TextWidget(
-              text: 'Vienna Music School',
-              weight: FontWeight.bold,
-              size: 24,
-            ),
-          ),
-          actions: [
-            Padding(
-                padding: const EdgeInsets.all(8),
-                child: BtnWidget(
-                  radius: 4,
-                  btnColor: Colors.white,
-                  textWidget: const TextWidget(
-                    text: 'Register',
-                    color: kBrownColor,
-                  ),
-                  onPress: () {
-                    Get.toNamed('/register');
-                  },
-                )),
-            Padding(
-                padding: EdgeInsets.only(
-                    left: 8, top: 8, bottom: 8, right: Get.width * 0.05),
-                child: BtnWidget(
-                  radius: 4,
-                  btnColor: kBrownColor,
-                  textWidget: const TextWidget(
-                    text: 'Login',
-                    color: Colors.white,
-                  ),
-                  onPress: () {
-                    Get.toNamed('/login');
-                  },
-                )),
-          ],
-        ),
+        backgroundColor: kWhiteBackground,
+        appBar: appBar(),
         body: SingleChildScrollView(
           child: Column(children: [
             //IMAGE BANNER
@@ -123,120 +109,102 @@ class LandingPage extends StatelessWidget {
             const SizedBox(
               height: 50,
             ),
-            Row(
-              children: [
-                //CARD
-                Expanded(
-                  child: GFCard(
-                    padding: EdgeInsets.all(0),
-                    elevation: 5,
-                    showImage: true,
-                    boxFit: BoxFit.fill,
-                    image: Image.network(placeHolderUrl),
-                    title: GFListTile(
-                      title: const TextWidget(
-                        text: 'Kelas Piano',
-                        size: 24,
-                        weight: FontWeight.bold,
+            SizedBox(
+              width: Get.width * 0.8,
+              child: GridView.builder(
+                  shrinkWrap: true,
+                  itemCount: 5,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      childAspectRatio: childAspect,
+                      crossAxisCount: crossAxisCount),
+                  itemBuilder: (context, index) {
+                    return GFCard(
+                      padding: EdgeInsets.all(0),
+                      elevation: 5,
+                      showImage: true,
+                      boxFit: BoxFit.fill,
+                      image: Image.network(placeHolderUrl),
+                      title: GFListTile(
+                        title: const TextWidget(
+                          text: 'Kelas Piano',
+                          size: 24,
+                          weight: FontWeight.bold,
+                        ),
+                        subTitle: SingleChildScrollView(
+                          child: TextWidget(
+                            text: landingPageCardSubtitle,
+                            maxLines: 20,
+                            textAlign: TextAlign.justify,
+                          ),
+                        ),
                       ),
-                      subTitle: TextWidget(
-                        text: landingPageCardSubtitle,
-                        maxLines: 20,
-                        textAlign: TextAlign.justify,
+                      buttonBar: GFButtonBar(
+                        alignment: WrapAlignment.start,
+                        runAlignment: WrapAlignment.start,
+                        crossAxisAlignment: WrapCrossAlignment.start,
+                        children: <Widget>[
+                          GFListTile(
+                              subTitle: BtnWidget(
+                            height: 40,
+                            radius: 4,
+                            btnColor: kBrownColor,
+                            onPress: () {},
+                            textWidget: TextWidget(text: 'Lihat Kelas'),
+                          )),
+                        ],
                       ),
-                    ),
-                    buttonBar: GFButtonBar(
-                      alignment: WrapAlignment.start,
-                      runAlignment: WrapAlignment.start,
-                      crossAxisAlignment: WrapCrossAlignment.start,
-                      children: <Widget>[
-                        GFListTile(
-                            subTitle: BtnWidget(
-                          height: 40,
-                          radius: 4,
-                          btnColor: kBrownColor,
-                          onPress: () {},
-                          textWidget: TextWidget(text: 'Lihat Kelas'),
-                        )),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GFCard(
-                    padding: EdgeInsets.all(0),
-                    elevation: 5,
-                    showImage: true,
-                    boxFit: BoxFit.fill,
-                    image: Image.network(placeHolderUrl),
-                    title: GFListTile(
-                      title: const TextWidget(
-                        text: 'Kelas Piano',
-                        size: 24,
-                        weight: FontWeight.bold,
-                      ),
-                      subTitle: TextWidget(
-                        text: landingPageCardSubtitle,
-                        maxLines: 20,
-                        textAlign: TextAlign.justify,
-                      ),
-                    ),
-                    buttonBar: GFButtonBar(
-                      alignment: WrapAlignment.start,
-                      runAlignment: WrapAlignment.start,
-                      crossAxisAlignment: WrapCrossAlignment.start,
-                      children: <Widget>[
-                        GFListTile(
-                            subTitle: BtnWidget(
-                          height: 40,
-                          radius: 4,
-                          btnColor: kBrownColor,
-                          onPress: () {},
-                          textWidget: TextWidget(text: 'Lihat Kelas'),
-                        )),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GFCard(
-                    padding: EdgeInsets.all(0),
-                    elevation: 5,
-                    showImage: true,
-                    boxFit: BoxFit.fill,
-                    image: Image.network(placeHolderUrl),
-                    title: GFListTile(
-                      title: const TextWidget(
-                        text: 'Kelas Piano',
-                        size: 24,
-                        weight: FontWeight.bold,
-                      ),
-                      subTitle: TextWidget(
-                        text: landingPageCardSubtitle,
-                        maxLines: 20,
-                        textAlign: TextAlign.justify,
-                      ),
-                    ),
-                    buttonBar: GFButtonBar(
-                      alignment: WrapAlignment.start,
-                      runAlignment: WrapAlignment.start,
-                      crossAxisAlignment: WrapCrossAlignment.start,
-                      children: <Widget>[
-                        GFListTile(
-                            subTitle: BtnWidget(
-                          height: 40,
-                          radius: 4,
-                          btnColor: kBrownColor,
-                          onPress: () {},
-                          textWidget: TextWidget(text: 'Lihat Kelas'),
-                        )),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            )
+                    );
+                  }),
+            ),
           ]),
         ));
+  }
+
+  AppBar appBar() {
+    return AppBar(
+      backgroundColor: kBrownGoldColor,
+      title: Padding(
+        padding: EdgeInsets.only(left: Get.width * 0.05),
+        child: InkWell(
+          onTap: () {
+            Get.toNamed('/');
+          },
+          child: const TextWidget(
+            text: 'Vienna Music School',
+            weight: FontWeight.bold,
+            size: 24,
+          ),
+        ),
+      ),
+      actions: [
+        Padding(
+            padding: const EdgeInsets.all(8),
+            child: BtnWidget(
+              radius: 4,
+              btnColor: Colors.white,
+              textWidget: const TextWidget(
+                text: 'Register',
+                color: kBrownColor,
+              ),
+              onPress: () {
+                Get.toNamed('/register');
+              },
+            )),
+        Padding(
+            padding: EdgeInsets.only(
+                left: 8, top: 8, bottom: 8, right: Get.width * 0.05),
+            child: BtnWidget(
+              radius: 4,
+              btnColor: kBrownColor,
+              textWidget: const TextWidget(
+                text: 'Login',
+                color: Colors.white,
+              ),
+              onPress: () {
+                Get.toNamed('/login');
+              },
+            )),
+      ],
+    );
   }
 }
