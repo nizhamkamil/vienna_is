@@ -11,12 +11,15 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_secure_storage: ^8.1.0
+  flutter_svg: ^2.0.5
   flutter_typeahead: ^4.8.0
   get: ^4.6.5
   getwidget: ^4.0.0
   google_fonts: ^4.0.4
+  http: ^0.13.6
   lottie: ^2.3.2
   pluto_grid: ^6.0.4
+  sidebarx: ^0.16.2
 
 dev_dependencies:
   flutter_test:

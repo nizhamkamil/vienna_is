@@ -1,15 +1,22 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getwidget/components/card/gf_card.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:vienna_is/config/theme.dart';
+import 'package:vienna_is/models/kelas.dart';
+import 'package:vienna_is/models/kelas_complete.dart';
+import 'package:vienna_is/view/widgets/appbar_widget.dart';
 import 'package:vienna_is/view/widgets/button.dart';
 import 'package:vienna_is/view/widgets/text.dart';
 
+import '../../controller/controller.dart';
+
 class LandingPage extends StatelessWidget {
-  const LandingPage({super.key});
+  LandingPage({super.key});
+
+  Controller controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +46,7 @@ class LandingPage extends StatelessWidget {
 
     return Scaffold(
         backgroundColor: kWhiteBackground,
-        appBar: appBar(),
+        appBar: appBarWidget(),
         body: SingleChildScrollView(
           child: Column(children: [
             //IMAGE BANNER
@@ -51,7 +58,7 @@ class LandingPage extends StatelessWidget {
                     height: Get.height * 0.7,
                     width: Get.width * 1,
                     child: Image.network(
-                      placeHolderUrl,
+                      bannerLandingPageUrl,
                       color: const Color.fromARGB(150, 0, 0, 0),
                       fit: BoxFit.cover,
                       colorBlendMode: BlendMode.darken,
@@ -88,7 +95,9 @@ class LandingPage extends StatelessWidget {
                       child: BtnWidget(
                           radius: 4,
                           btnColor: kBrownColor,
-                          onPress: () {},
+                          onPress: () async {
+                            await controller.fetchKelas();
+                          },
                           textWidget: const TextWidget(
                             text: 'Join Now',
                             color: Colors.white,
@@ -110,101 +119,75 @@ class LandingPage extends StatelessWidget {
               height: 50,
             ),
             SizedBox(
-              width: Get.width * 0.8,
-              child: GridView.builder(
-                  shrinkWrap: true,
-                  itemCount: 5,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      childAspectRatio: childAspect,
-                      crossAxisCount: crossAxisCount),
-                  itemBuilder: (context, index) {
-                    return GFCard(
-                      padding: EdgeInsets.all(0),
-                      elevation: 5,
-                      showImage: true,
-                      boxFit: BoxFit.fill,
-                      image: Image.network(placeHolderUrl),
-                      title: GFListTile(
-                        title: const TextWidget(
-                          text: 'Kelas Piano',
-                          size: 24,
-                          weight: FontWeight.bold,
-                        ),
-                        subTitle: SingleChildScrollView(
-                          child: TextWidget(
-                            text: landingPageCardSubtitle,
-                            maxLines: 20,
-                            textAlign: TextAlign.justify,
-                          ),
-                        ),
-                      ),
-                      buttonBar: GFButtonBar(
-                        alignment: WrapAlignment.start,
-                        runAlignment: WrapAlignment.start,
-                        crossAxisAlignment: WrapCrossAlignment.start,
-                        children: <Widget>[
-                          GFListTile(
-                              subTitle: BtnWidget(
-                            height: 40,
-                            radius: 4,
-                            btnColor: kBrownColor,
-                            onPress: () {},
-                            textWidget: TextWidget(text: 'Lihat Kelas'),
-                          )),
-                        ],
-                      ),
-                    );
-                  }),
-            ),
+                width: Get.width * 0.8,
+                child: FutureBuilder(
+                  future: controller.fetchKelas(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData &&
+                        snapshot.connectionState == ConnectionState.done) {
+                      return GridView.builder(
+                          shrinkWrap: true,
+                          itemCount: controller.kelasKomplitList.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  childAspectRatio: childAspect,
+                                  crossAxisCount: crossAxisCount),
+                          itemBuilder: (context, index) {
+                            return GFCard(
+                              padding: EdgeInsets.all(0),
+                              elevation: 5,
+                              showImage: true,
+                              boxFit: BoxFit.fill,
+                              image: Image.network(
+                                '$configUrl/assets/${controller.kelasKomplitList[index].kelasFoto[0].pathFoto}',
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  return loadingProgress == null
+                                      ? child
+                                      : const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                },
+                              ),
+                              title: GFListTile(
+                                title: TextWidget(
+                                  text: controller
+                                      .kelasKomplitList[index].namaKelas,
+                                  size: 24,
+                                  weight: FontWeight.bold,
+                                ),
+                                subTitle: SingleChildScrollView(
+                                  child: TextWidget(
+                                    text: controller
+                                        .kelasKomplitList[index].deskripsiKelas,
+                                    maxLines: 20,
+                                    textAlign: TextAlign.justify,
+                                  ),
+                                ),
+                              ),
+                              buttonBar: GFButtonBar(
+                                alignment: WrapAlignment.start,
+                                runAlignment: WrapAlignment.start,
+                                crossAxisAlignment: WrapCrossAlignment.start,
+                                children: <Widget>[
+                                  GFListTile(
+                                      subTitle: BtnWidget(
+                                    height: 40,
+                                    radius: 4,
+                                    btnColor: kBrownColor,
+                                    onPress: () {},
+                                    textWidget: TextWidget(text: 'Lihat Kelas'),
+                                  )),
+                                ],
+                              ),
+                            );
+                          });
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  },
+                )),
           ]),
         ));
-  }
-
-  AppBar appBar() {
-    return AppBar(
-      backgroundColor: kBrownGoldColor,
-      title: Padding(
-        padding: EdgeInsets.only(left: Get.width * 0.05),
-        child: InkWell(
-          onTap: () {
-            Get.toNamed('/');
-          },
-          child: const TextWidget(
-            text: 'Vienna Music School',
-            weight: FontWeight.bold,
-            size: 24,
-          ),
-        ),
-      ),
-      actions: [
-        Padding(
-            padding: const EdgeInsets.all(8),
-            child: BtnWidget(
-              radius: 4,
-              btnColor: Colors.white,
-              textWidget: const TextWidget(
-                text: 'Register',
-                color: kBrownColor,
-              ),
-              onPress: () {
-                Get.toNamed('/register');
-              },
-            )),
-        Padding(
-            padding: EdgeInsets.only(
-                left: 8, top: 8, bottom: 8, right: Get.width * 0.05),
-            child: BtnWidget(
-              radius: 4,
-              btnColor: kBrownColor,
-              textWidget: const TextWidget(
-                text: 'Login',
-                color: Colors.white,
-              ),
-              onPress: () {
-                Get.toNamed('/login');
-              },
-            )),
-      ],
-    );
   }
 }
