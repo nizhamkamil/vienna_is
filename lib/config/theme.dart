@@ -5,6 +5,7 @@ const Color kAccentBrownGoldColor = Color.fromARGB(255, 218, 184, 104);
 const Color kBrownGoldColorSecondary = Color.fromARGB(255, 192, 165, 97);
 const Color kBrownColor = Color.fromARGB(255, 82, 61, 32);
 const Color kWhiteBackground = Color.fromARGB(255, 245, 245, 245);
+const Color kGreyColor = Colors.grey;
 
 const String landingPageCardSubtitle =
     'Gitar adalah salah satu instrumen musik paling ikonik di dunia. Di kelas gitar kami, Anda akan memasuki dunia melodi yang penuh keajaiban. Dengan bimbingan guru-guru berpengalaman, Anda akan belajar teknik-teknik dasar hingga tingkat mahir dalam memainkan gitar.';

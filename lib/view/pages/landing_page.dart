@@ -95,8 +95,8 @@ class LandingPage extends StatelessWidget {
                       child: BtnWidget(
                           radius: 4,
                           btnColor: kBrownColor,
-                          onPress: () async {
-                            await controller.fetchKelas();
+                          onPress: () {
+                            Get.toNamed('/register');
                           },
                           textWidget: const TextWidget(
                             text: 'Join Now',

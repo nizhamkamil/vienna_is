@@ -2,40 +2,43 @@
 //
 //     final guru = guruFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 List<Guru> guruFromJson(String str) =>
     List<Guru>.from(json.decode(str).map((x) => Guru.fromJson(x)));
 
+Guru guruSingleFromJson(String str) => Guru.fromJson(json.decode(str));
+
 String guruToJson(List<Guru> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
+String guruSingleToJson(Guru data) => json.encode(data.toJson());
+
 class Guru {
-  final int idGuru;
-  final String nama;
-  final String username;
-  final String password;
-  final String alamat;
-  final String email;
-  final String noTelepon;
-  final String agama;
-  final String kewarganegaraan;
-  final String jenisKelamin;
-  final String statusNikah;
+  final int? idGuru;
+  final String? nama;
+  final String? username;
+  final String? password;
+  final String? alamat;
+  final String? email;
+  final String? noTelepon;
+  final String? agama;
+  final String? kewarganegaraan;
+  final String? jenisKelamin;
+  final String? statusNikah;
 
   Guru({
-    required this.idGuru,
-    required this.nama,
-    required this.username,
-    required this.password,
-    required this.alamat,
-    required this.email,
-    required this.noTelepon,
-    required this.agama,
-    required this.kewarganegaraan,
-    required this.jenisKelamin,
-    required this.statusNikah,
+    this.idGuru,
+    this.nama,
+    this.username,
+    this.password,
+    this.alamat,
+    this.email,
+    this.noTelepon,
+    this.agama,
+    this.kewarganegaraan,
+    this.jenisKelamin,
+    this.statusNikah,
   });
 
   Guru copyWith({

@@ -10,8 +10,10 @@ class BtnWidget extends StatelessWidget {
   final double? height;
   final double? radius;
   final TextWidget? textWidget;
+  Icon? icon = null;
+  List<BoxShadow>? boxShadow = null;
 
-  const BtnWidget(
+  BtnWidget(
       {Key? key,
       required this.onPress,
       this.btnColor,
@@ -20,6 +22,8 @@ class BtnWidget extends StatelessWidget {
       this.width,
       this.height,
       this.radius,
+      this.icon,
+      this.boxShadow,
       required this.textWidget})
       : super(key: key);
 
@@ -28,6 +32,8 @@ class BtnWidget extends StatelessWidget {
     return Container(
       width: width,
       height: height,
+      decoration:
+          boxShadow != null ? BoxDecoration(boxShadow: boxShadow) : null,
       child: ElevatedButton(
           onPressed: onPress,
           style: ButtonStyle(
@@ -36,7 +42,21 @@ class BtnWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(radius ?? 0.0),
                 side: BorderSide(color: outlineColor ?? Colors.transparent),
               ))),
-          child: textWidget),
+          child: icon == null
+              ? textWidget
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    icon ?? const Icon(Icons.add),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    textWidget ??
+                        const TextWidget(
+                          text: 'Button',
+                        ),
+                  ],
+                )),
     );
   }
 }

@@ -118,7 +118,7 @@ class RegisterPage extends StatelessWidget {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: BtnWidget(
-                        height: 50,
+                        height: 40,
                         radius: 4,
                         btnColor: kBrownColor,
                         onPress: () {

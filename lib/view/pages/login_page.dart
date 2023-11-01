@@ -4,9 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:vienna_is/controller/controller.dart';
-import 'package:vienna_is/models/admin.dart';
-import 'package:vienna_is/models/guru.dart';
-import 'package:vienna_is/models/murid.dart';
 import '../../config/theme.dart';
 import '../widgets/appbar_widget.dart';
 import '../widgets/button.dart';
@@ -18,9 +15,9 @@ class LoginPage extends StatelessWidget {
   RxInt? loginValue = 0.obs;
   Controller controller = Get.find<Controller>();
   TextEditingController usernameController =
-      TextEditingController(text: 'userMurid');
+      TextEditingController(text: 'admin1');
   TextEditingController passwordController =
-      TextEditingController(text: 'passwordMurid');
+      TextEditingController(text: 'admin1');
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +105,7 @@ class LoginPage extends StatelessWidget {
       child: Align(
         alignment: Alignment.centerLeft,
         child: BtnWidget(
-          height: 50,
+          height: 40,
           radius: 4,
           btnColor: kBrownColor,
           onPress: () async {
@@ -117,8 +114,8 @@ class LoginPage extends StatelessWidget {
               await controller.loginGuru(
                   usernameController.value.text, passwordController.value.text);
               if (controller.userGuru.isNotEmpty) {
-                print(guruToJson(controller.userGuru));
-                controller.checkUserRole();
+                await controller.checkUserRole();
+                await controller.saveUserPassword();
                 Get.offAllNamed('/home');
               } else {
                 snackbar();
@@ -129,8 +126,8 @@ class LoginPage extends StatelessWidget {
               await controller.loginMurid(
                   usernameController.value.text, passwordController.value.text);
               if (controller.userMurid.isNotEmpty) {
-                print(muridToJson(controller.userMurid));
-                controller.checkUserRole();
+                await controller.checkUserRole();
+                await controller.saveUserPassword();
                 Get.offAllNamed('/home');
               } else {
                 snackbar();
@@ -138,12 +135,11 @@ class LoginPage extends StatelessWidget {
             }
             //LOGIN ADMIN
             else if (loginValue?.value == 2) {
-              print('login as admin');
               await controller.loginAdmin(
                   usernameController.value.text, passwordController.value.text);
-
               if (controller.userAdmin.value.idAdmin != null) {
                 controller.checkUserRole();
+                await controller.saveUserPassword();
                 Get.offAllNamed('/home');
               } else {
                 snackbar();

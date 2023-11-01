@@ -2,159 +2,215 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:vienna_is/config/theme.dart';
+import 'package:vienna_is/controller/controller.dart';
+import 'package:vienna_is/controller/pluto_controller.dart';
+import 'package:vienna_is/view/widgets/alert_dialog_widget.dart';
 import 'package:vienna_is/view/widgets/button.dart';
 import 'package:vienna_is/view/widgets/floating_modal.dart';
 import 'package:vienna_is/view/widgets/modal_pop_up.dart';
-import 'package:vienna_is/view/widgets/pluto_table/tabel_guru.dart';
 import 'package:vienna_is/view/widgets/text.dart';
 import 'package:vienna_is/view/widgets/text_form_field_widget.dart';
-import 'package:vienna_is/view/widgets/type_ahead_form_field.dart';
 
-import '../../../controller/controller.dart';
+class TabelGuru extends StatelessWidget {
+  TabelGuru({super.key});
 
-class HalamanGuru extends StatelessWidget {
-  HalamanGuru({super.key});
   Controller controller = Get.find();
-  Rx<TextEditingController> textController = TextEditingController().obs;
+  PlutoController plutoController = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    RxBool showFilter = false.obs;
-    return Padding(
-      padding: const EdgeInsets.all(80),
-      child: Column(
-        children: [
-          TextWidget(
-            text: 'Halaman Guru',
-            size: 24,
-            weight: FontWeight.bold,
-          ),
-          SizedBox(
-            height: 50,
-          ),
-          Row(
+    List<PlutoColumn> column = [
+      PlutoColumn(
+          textAlign: PlutoColumnTextAlign.center,
+          title: 'Id Guru',
+          field: 'id_guru',
+          type: PlutoColumnType.number(),
+          backgroundColor: kAccentBrownGoldColor,
+          width: 75),
+      PlutoColumn(
+          title: 'Nama',
+          field: 'nama',
+          type: PlutoColumnType.text(),
+          backgroundColor: kAccentBrownGoldColor),
+      PlutoColumn(
+          title: 'Alamat',
+          field: 'alamat',
+          type: PlutoColumnType.text(),
+          backgroundColor: kAccentBrownGoldColor),
+      PlutoColumn(
+          title: 'Email',
+          field: 'email',
+          type: PlutoColumnType.text(),
+          backgroundColor: kAccentBrownGoldColor),
+      PlutoColumn(
+          title: 'Username',
+          field: 'username',
+          type: PlutoColumnType.text(),
+          hide: true,
+          backgroundColor: kAccentBrownGoldColor),
+      PlutoColumn(
+          title: 'Password',
+          field: 'password',
+          type: PlutoColumnType.text(),
+          hide: true,
+          backgroundColor: kAccentBrownGoldColor),
+      PlutoColumn(
+          title: 'No Telepon',
+          field: 'no_telepon',
+          type: PlutoColumnType.text(),
+          backgroundColor: kAccentBrownGoldColor),
+      PlutoColumn(
+          title: 'Agama',
+          field: 'agama',
+          type: PlutoColumnType.text(),
+          backgroundColor: kAccentBrownGoldColor),
+      PlutoColumn(
+          title: 'Kewarganegaraan',
+          field: 'kewarganegaraan',
+          type: PlutoColumnType.text(),
+          backgroundColor: kAccentBrownGoldColor),
+      PlutoColumn(
+          title: 'Jenis Kelamin',
+          field: 'jenis_kelamin',
+          type: PlutoColumnType.text(),
+          backgroundColor: kAccentBrownGoldColor),
+      PlutoColumn(
+          title: 'Status Nikah',
+          field: 'status_nikah',
+          type: PlutoColumnType.text(),
+          backgroundColor: kAccentBrownGoldColor),
+      PlutoColumn(
+        title: 'Action',
+        field: 'action',
+        type: PlutoColumnType.text(),
+        backgroundColor: kAccentBrownGoldColor,
+        renderer: (rendererContext) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(
-                flex: 1,
-                child: TextWidget(
-                  text: 'Tabel Guru',
-                  weight: FontWeight.bold,
-                  size: 18,
-                ),
-              ),
-              Spacer(
-                flex: 6,
-              ),
-              BtnWidget(
-                radius: 4,
-                height: 40,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 2,
-                    blurRadius: 2,
-                  )
-                ],
-                btnColor: Colors.white,
-                outlineColor: kBrownGoldColorSecondary,
+              IconButton(
                 icon: Icon(
-                  Icons.filter_alt,
-                  color: kBrownGoldColorSecondary,
+                  Icons.edit,
+                  color: Colors.blue,
                 ),
-                onPress: () {
-                  showFilter.value = !showFilter.value;
-                  controller.guruStateManager
-                      ?.setShowColumnFilter(showFilter.value);
-                },
-                textWidget: TextWidget(
-                  text: 'Show Filter',
-                  color: kBrownGoldColorSecondary,
-                ),
-              ),
-              SizedBox(
-                width: 30,
-              ),
-              BtnWidget(
-                radius: 4,
-                height: 40,
-                btnColor: kBrownGoldColorSecondary,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 2,
-                    blurRadius: 2,
-                  )
-                ],
-                icon: Icon(Icons.add),
-                onPress: () {
+                onPressed: () {
                   showFloatingModalBottomSheet(
+                    context: context,
+                    builder: (context) {
+                      controller.clearTextEditingController();
+                      controller.openEditGuru(rendererContext);
+                      return editModal(context, rendererContext);
+                    },
+                  );
+                },
+              ),
+              IconButton(
+                onPressed: () {
+                  showDialog(
                       context: context,
                       builder: (context) {
-                        controller.clearTextEditingController();
-                        return ModalPopUp(
-                          onPressed: () async {
-                            if (controller.formKeyGuru.currentState!
-                                .validate()) {
-                              await controller.addGuru();
-                            }
+                        return AlertDialogWidget(
+                          onPress: () async {
+                            await controller.deleteGuru(
+                                rendererContext.row.cells['id_guru']!.value);
+                            plutoController.refreshPlutoTable(
+                                controller.guruStateManager!,
+                                plutoController
+                                    .getGuruRow(controller.guruList));
                           },
-                          popupTitle: 'Add New',
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal:
-                                          MediaQuery.of(context).size.width *
-                                              0.05),
-                                  child: SingleChildScrollView(
-                                    child: Form(
-                                      key: controller.formKeyGuru,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          namaField(context),
-                                          usernameField(context),
-                                          passwordField(context),
-                                          alamatField(context),
-                                          emailField(context),
-                                          teleponField(context),
-                                          kewarganegaraanField(context),
-                                          agamaField(context),
-                                          kelaminField(context),
-                                          statusNikahField(context),
-                                          SizedBox(
-                                            height: 20,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
                         );
                       });
                 },
-                textWidget: TextWidget(
-                  text: 'Add New',
+                icon: Icon(
+                  Icons.delete,
+                  color: Colors.red,
                 ),
               )
             ],
-          ),
-          SizedBox(
-            height: 30,
-          ),
+          );
+        },
+      )
+    ];
+    return FutureBuilder(
+      future: controller.fetchGuru(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasData) {
+          return PlutoGrid(
+            columns: column,
+            rows: plutoController.getGuruRow(controller.guruList),
+            onLoaded: (event) {
+              controller.guruStateManager = event.stateManager;
+            },
+            configuration: PlutoGridConfiguration(
+              columnSize: PlutoGridColumnSizeConfig(
+                  autoSizeMode: PlutoAutoSizeMode.scale),
+              style: PlutoGridStyleConfig(
+                borderColor: Colors.transparent,
+                oddRowColor: kWhiteBackground,
+                gridBorderRadius: BorderRadius.all(
+                  Radius.circular(4),
+                ),
+              ),
+            ),
+            createFooter: (stateManager) {
+              stateManager.setPageSize(10, notify: false);
+              return PlutoPagination(stateManager);
+            },
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
+
+  Widget editModal(
+      BuildContext context, PlutoColumnRendererContext rendererContext) {
+    return ModalPopUp(
+      onPressed: () async {
+        if (controller.formKeyGuru.currentState!.validate()) {
+          await controller
+              .updateGuru(rendererContext.row.cells['id_guru']!.value);
+          plutoController.refreshPlutoTable(controller.guruStateManager!,
+              plutoController.getGuruRow(controller.guruList));
+        }
+      },
+      popupTitle: 'Edit',
+      child: Column(
+        children: [
           Expanded(
-            child: TabelGuru(),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width * 0.05),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: controller.formKeyGuru,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      namaField(context),
+                      usernameField(context),
+                      passwordField(context),
+                      alamatField(context),
+                      emailField(context),
+                      teleponField(context),
+                      kewarganegaraanField(context),
+                      agamaField(context),
+                      kelaminField(context),
+                      statusNikahField(context),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           )
         ],
       ),
@@ -325,41 +381,6 @@ class HalamanGuru extends StatelessWidget {
     );
   }
 
-  SizedBox agamaField(BuildContext context) {
-    return SizedBox(
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: 20,
-        ),
-        child: DropdownButtonFormField(
-          validator: (value) {
-            if (value == null) {
-              return 'Agama tidak boleh kosong';
-            } else {
-              return null;
-            }
-          },
-          items: controller.dropdownAgama,
-          onChanged: (value) {
-            controller.agamaController.text = value.toString();
-          },
-          decoration: InputDecoration(
-            label: TextWidget(
-              text: 'Agama',
-              size: 16,
-            ),
-            floatingLabelBehavior: FloatingLabelBehavior.always,
-            border: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(4),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   SizedBox kewarganegaraanField(BuildContext context) {
     return SizedBox(
       child: Padding(
@@ -391,6 +412,7 @@ class HalamanGuru extends StatelessWidget {
               return null;
             }
           },
+          value: controller.jenisKelaminController.value.text,
           items: controller.dropdownJenisKelamin,
           onChanged: (value) {
             controller.jenisKelaminController.text = value.toString();
@@ -398,6 +420,42 @@ class HalamanGuru extends StatelessWidget {
           decoration: InputDecoration(
             label: TextWidget(
               text: 'Jenis Kelamin',
+              size: 16,
+            ),
+            floatingLabelBehavior: FloatingLabelBehavior.always,
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(4),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  SizedBox agamaField(BuildContext context) {
+    return SizedBox(
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: 20,
+        ),
+        child: DropdownButtonFormField(
+          validator: (value) {
+            if (value == null) {
+              return 'Agama tidak boleh kosong';
+            } else {
+              return null;
+            }
+          },
+          value: controller.agamaController.value.text,
+          items: controller.dropdownAgama,
+          onChanged: (value) {
+            controller.agamaController.text = value.toString();
+          },
+          decoration: InputDecoration(
+            label: TextWidget(
+              text: 'Agama',
               size: 16,
             ),
             floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -426,6 +484,7 @@ class HalamanGuru extends StatelessWidget {
               return null;
             }
           },
+          value: controller.statusNikahController.value.text,
           items: controller.dropdownStatusNikah,
           onChanged: (value) {
             controller.statusNikahController.text = value.toString();

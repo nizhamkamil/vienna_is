@@ -58,8 +58,6 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
       scrollDirection: Axis.vertical,
       reverse: true,
       child: TextFormField(
-        // enabled: enabled ?? true,
-        // readOnly: enabled ?? true,
         obscureText: widget.obscureText,
         enableInteractiveSelection: widget.enabled ?? true,
         onTap: widget.enabled == false
@@ -87,22 +85,26 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
                       : Icon(Icons.visibility_off))
               : null,
           hintText: widget.hintText ?? widget.labelText.tr,
-          floatingLabelBehavior: FloatingLabelBehavior.auto,
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.all(10.0),
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          labelStyle: TextStyle(
+            color: Colors.grey,
+          ),
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(4),
+            ),
+          ),
           fillColor: Colors.grey[300],
           filled: widget.enabled == false ? true : false,
           // counterText: '',
         ),
-        scrollPadding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom * 1.5),
         controller: widget.textCtrl,
         validator: widget.validator == true
             ? (value) {
                 if (value != null && value.isEmpty) {
-                  return 'fieldCannot'.tr;
+                  return 'Field cannot be empty'.tr;
                 } else if (value != null && value.trim().isEmpty) {
-                  return 'whitespaceWarning'.tr;
+                  return 'Field cannot contain whitespace only'.tr;
                 }
                 return null;
               }
