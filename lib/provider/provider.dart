@@ -92,6 +92,35 @@ class AppProvider extends GetConnect {
     }
   }
 
+  static Future<Murid> addMurid(String body) async {
+    var response = await client.post(Uri.parse('$config/murid'),
+        body: body, headers: headers);
+    if (response.statusCode == 200) {
+      return muridSingleFromJson(response.body);
+    } else {
+      return Murid();
+    }
+  }
+
+  static Future<String> deleteMurid(int id) async {
+    var response = await client.delete(Uri.parse('$config/murid/$id'));
+    if (response.statusCode == 200) {
+      return 'SUCCESS';
+    } else {
+      return 'FAILED';
+    }
+  }
+
+  static Future<Murid> updateMurid(String body, int id) async {
+    var response = await client.put(Uri.parse('$config/murid/$id'),
+        body: body, headers: headers);
+    if (response.statusCode == 200) {
+      return muridSingleFromJson(response.body);
+    } else {
+      return Murid();
+    }
+  }
+
   static Future<Guru> updateGuru(String body, int id) async {
     var response = await client.put(Uri.parse('$config/guru/$id'),
         body: body, headers: headers);

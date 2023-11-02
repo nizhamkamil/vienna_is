@@ -148,6 +148,7 @@ class TabelGuru extends StatelessWidget {
             onLoaded: (event) {
               controller.guruStateManager = event.stateManager;
             },
+            mode: PlutoGridMode.readOnly,
             configuration: PlutoGridConfiguration(
               columnSize: PlutoGridColumnSizeConfig(
                   autoSizeMode: PlutoAutoSizeMode.scale),

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
 class TextFormFieldWidget extends StatefulWidget {
@@ -83,7 +84,19 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
                   icon: isVisible.value
                       ? Icon(Icons.visibility)
                       : Icon(Icons.visibility_off))
-              : null,
+              : widget.type == 'date'
+                  ? IconButton(
+                      onPressed: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2015),
+                            lastDate: DateTime(2101));
+                        widget.textCtrl!.text =
+                            DateFormat('yyyy-MM-dd').format(pickedDate!);
+                      },
+                      icon: Icon(Icons.calendar_month))
+                  : null,
           hintText: widget.hintText ?? widget.labelText.tr,
           floatingLabelBehavior: FloatingLabelBehavior.always,
           labelStyle: TextStyle(

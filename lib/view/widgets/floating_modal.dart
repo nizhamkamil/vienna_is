@@ -47,7 +47,7 @@ Future<T> showFloatingModalBottomSheet<T>(
     bool? isDismissible}) async {
   final result = await showCustomModalBottomSheet(
       isDismissible: isDismissible ?? true,
-      enableDrag: enableDrag ?? true,
+      enableDrag: enableDrag ?? false,
       context: context,
       builder: builder,
       containerWidget: (_, animation, child) => FloatingModal(

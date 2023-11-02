@@ -136,7 +136,7 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                         text: controller.role.value == 'Guru'
                             ? controller.userGuru[0].nama!
                             : controller.role.value == 'Murid'
-                                ? controller.userMurid[0].nama
+                                ? controller.userMurid[0].nama!
                                 : controller.userAdmin.value.nama ?? '',
                         maxLines: 4,
                       ),

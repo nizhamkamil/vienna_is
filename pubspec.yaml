@@ -17,6 +17,7 @@ dependencies:
   getwidget: ^4.0.0
   google_fonts: ^4.0.4
   http: ^0.13.6
+  intl: ^0.18.1
   lottie: ^2.3.2
   modal_bottom_sheet: ^2.1.2
   pluto_grid: ^6.0.4

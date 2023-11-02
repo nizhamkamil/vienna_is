@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidebarx/sidebarx.dart';
@@ -49,7 +50,7 @@ class Controller extends GetxController {
   //Key Form
   GlobalKey<FormState> formKeyGuru = GlobalKey<FormState>();
 
-  //TextEditingController
+  //TextEditingController Guru
   TextEditingController namaController = TextEditingController();
   TextEditingController alamatController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -61,6 +62,25 @@ class Controller extends GetxController {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  //TextEditingController Murid
+  TextEditingController namaMuridController = TextEditingController();
+  TextEditingController usernameMuridController = TextEditingController();
+  TextEditingController passwordMuridController = TextEditingController();
+  TextEditingController alamatMuridController = TextEditingController();
+  TextEditingController emailMuridController = TextEditingController();
+  TextEditingController noTeleponMuridController = TextEditingController();
+  TextEditingController jenisKelaminMuridController = TextEditingController();
+  TextEditingController tanggalMasukMuridController = TextEditingController();
+  TextEditingController agamaMuridController = TextEditingController();
+  TextEditingController kewarganegaraanMuridController =
+      TextEditingController();
+  TextEditingController statusDaftarMuridController = TextEditingController();
+  TextEditingController namaWaliMuridController = TextEditingController();
+  TextEditingController tanggalLahirMuridController = TextEditingController();
+  TextEditingController tempatLahirMuridController = TextEditingController();
+  TextEditingController tipePembelajaranMuridController =
+      TextEditingController();
+
   //Constant
   List<DropdownMenuItem> dropdownJenisKelamin = [
     const DropdownMenuItem(
@@ -70,6 +90,28 @@ class Controller extends GetxController {
     const DropdownMenuItem(
       value: 'Perempuan',
       child: Text('Perempuan'),
+    ),
+  ];
+
+  List<DropdownMenuItem> dropdownTipePembelajaran = [
+    const DropdownMenuItem(
+      value: 'Ujian',
+      child: Text('Ujian'),
+    ),
+    const DropdownMenuItem(
+      value: 'Non-ujian',
+      child: Text('Non-ujian'),
+    ),
+  ];
+
+  List<DropdownMenuItem> dropdownStatusDaftar = [
+    const DropdownMenuItem(
+      value: 'Aktif',
+      child: Text('Aktif'),
+    ),
+    const DropdownMenuItem(
+      value: 'Tidak aktif',
+      child: Text('Tidak aktif'),
     ),
   ];
 
@@ -194,6 +236,24 @@ class Controller extends GetxController {
     statusNikahController.clear();
   }
 
+  clearTextEditingControllerMurid() {
+    namaMuridController.clear();
+    usernameMuridController.clear();
+    passwordMuridController.clear();
+    alamatMuridController.clear();
+    emailMuridController.clear();
+    noTeleponMuridController.clear();
+    jenisKelaminMuridController.clear();
+    tanggalMasukMuridController.clear();
+    agamaMuridController.clear();
+    kewarganegaraanMuridController.clear();
+    statusDaftarMuridController.clear();
+    namaWaliMuridController.clear();
+    tanggalLahirMuridController.clear();
+    tempatLahirMuridController.clear();
+    tipePembelajaranMuridController.clear();
+  }
+
   Future<List<Kelas>> fetchKelas() async {
     var res = await AppProvider.getKelas();
     kelasList.value = res;
@@ -215,6 +275,7 @@ class Controller extends GetxController {
     return res;
   }
 
+  //!START MURID
   Future<List<Murid>> loginMurid(String username, String password) async {
     Future<SharedPreferences> preferences = SharedPreferences.getInstance();
     SharedPreferences prefs = await preferences;
@@ -229,6 +290,195 @@ class Controller extends GetxController {
     userMurid.value = res;
     return res;
   }
+
+  Future<Murid> addMurid() async {
+    PlutoController plutoController = Get.find();
+    Murid request = Murid(
+      idMurid: null,
+      nama: namaMuridController.text,
+      username: usernameMuridController.text,
+      password: passwordMuridController.text,
+      alamat: alamatMuridController.text,
+      email: emailMuridController.text,
+      noTelepon: noTeleponMuridController.text,
+      agama: agamaMuridController.text,
+      kewarganegaraan: kewarganegaraanMuridController.text,
+      jenisKelamin: jenisKelaminMuridController.text,
+      tanggalMasuk: convertYearMonthDayToDateTime(
+          tanggalMasukMuridController.text.toString()),
+      statusDaftar: statusDaftarMuridController.text,
+      namaWali: namaWaliMuridController.text,
+      tanggalLahir: convertYearMonthDayToDateTime(
+          tanggalLahirMuridController.text.toString()),
+      tempatLahir: tempatLahirMuridController.text,
+      tipePembelajaran: tipePembelajaranMuridController.text,
+    );
+    String jsonRequest = muridSingleToJson(request);
+    print(jsonRequest);
+
+    var res = await AppProvider.addMurid(jsonRequest);
+    if (res.username != null) {
+      await fetchMurid();
+      plutoController.refreshPlutoTable(
+        muridStateManager!,
+        plutoController.getMuridRow(muridList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Murid berhasil ditambahkan',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Murid gagal ditambahkan',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+    }
+    return res;
+  }
+
+  Future<List<Murid>> fetchMurid() async {
+    var res = await AppProvider.getAllMurid();
+    muridList.value = res;
+    return res;
+  }
+
+  Future<Murid> updateMurid(int id) async {
+    PlutoController plutoController = Get.find();
+    Murid request = Murid(
+      idMurid: null,
+      nama: namaMuridController.text,
+      username: usernameMuridController.text,
+      password: passwordMuridController.text,
+      alamat: alamatMuridController.text,
+      email: emailMuridController.text,
+      noTelepon: noTeleponMuridController.text,
+      agama: agamaMuridController.text,
+      kewarganegaraan: kewarganegaraanMuridController.text,
+      jenisKelamin: jenisKelaminMuridController.text,
+      tanggalMasuk: convertYearMonthDayToDateTime(
+          tanggalMasukMuridController.text.toString()),
+      statusDaftar: statusDaftarMuridController.text,
+      namaWali: namaWaliMuridController.text,
+      tanggalLahir: convertYearMonthDayToDateTime(
+          tanggalLahirMuridController.text.toString()),
+      tempatLahir: tempatLahirMuridController.text,
+      tipePembelajaran: tipePembelajaranMuridController.text,
+    );
+    String jsonRequest = muridSingleToJson(request);
+    print(jsonRequest);
+    var res = await AppProvider.updateMurid(jsonRequest, id);
+    if (res.username != null) {
+      await fetchMurid();
+      plutoController.refreshPlutoTable(
+        muridStateManager!,
+        plutoController.getMuridRow(muridList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Murid berhasil diupdate',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Murid gagal diupdate',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+    }
+    return res;
+  }
+
+  openEditMurid(PlutoColumnRendererContext rendererContext) {
+    namaMuridController.text =
+        rendererContext.row.cells['nama']!.value.toString();
+    alamatMuridController.text =
+        rendererContext.row.cells['alamat']!.value.toString();
+    emailMuridController.text =
+        rendererContext.row.cells['email']!.value.toString();
+    usernameMuridController.text =
+        rendererContext.row.cells['username']!.value.toString();
+    passwordMuridController.text = rendererContext.row.cells['password']!.value;
+    noTeleponMuridController.text =
+        rendererContext.row.cells['noTelepon']!.value.toString();
+    agamaMuridController.text =
+        rendererContext.row.cells['agama']!.value.toString();
+    kewarganegaraanMuridController.text =
+        rendererContext.row.cells['kewarganegaraan']!.value.toString();
+    jenisKelaminMuridController.text =
+        rendererContext.row.cells['jenisKelamin']!.value.toString();
+    statusDaftarMuridController.text =
+        rendererContext.row.cells['statusDaftar']!.value.toString();
+    namaWaliMuridController.text =
+        rendererContext.row.cells['namaWali']!.value.toString();
+    tipePembelajaranMuridController.text =
+        rendererContext.row.cells['tipePembelajaran']!.value.toString();
+    tanggalMasukMuridController.text = dateFormator(
+        convertYearMonthDayToDateTime(
+            rendererContext.row.cells['tanggalMasuk']!.value.toString()));
+    tempatLahirMuridController.text =
+        rendererContext.row.cells['tempatLahir']!.value.toString();
+    tanggalLahirMuridController.text = dateFormator(
+        convertYearMonthDayToDateTime(
+            rendererContext.row.cells['tanggalLahir']!.value.toString()));
+    namaWaliMuridController.text =
+        rendererContext.row.cells['namaWali']!.value.toString();
+  }
+
+  Future<String> deleteMurid(int id) async {
+    PlutoController plutoController = Get.find();
+    var res = await AppProvider.deleteMurid(id);
+    if (res == 'SUCCESS') {
+      await fetchMurid();
+      plutoController.refreshPlutoTable(
+        muridStateManager!,
+        plutoController.getMuridRow(muridList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Murid berhasil dihapus',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+      return 'SUCCESS';
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Murid gagal dihapus',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+      return 'FAILED';
+    }
+  }
+
+  //!END MURID
 
   Future<Admin> loginAdmin(String username, String password) async {
     Future<SharedPreferences> preferences = SharedPreferences.getInstance();
@@ -491,12 +741,6 @@ class Controller extends GetxController {
     // } else {}
   }
 
-  Future<List<Murid>> fetchMurid() async {
-    var res = await AppProvider.getAllMurid();
-    muridList.value = res;
-    return res;
-  }
-
   Future<List<Jadwal>> fetchJadwal() async {
     var res = await AppProvider.getAllJadwal();
     print('get jadwal');
@@ -527,5 +771,24 @@ class Controller extends GetxController {
     var res = await AppProvider.getAllRuangan();
     ruanganList.value = res;
     return res;
+  }
+
+  static dateFormator(DateTime? date) {
+    if (date != null) {
+      return DateFormat('yyyy-MM-dd').format(date).toString();
+    } else {
+      return DateFormat('yyyy-MM-dd')
+          .format(DateTime.utc(0001, 1, 1))
+          .toString();
+    }
+  }
+
+  static DateTime convertYearMonthDayToDateTime(String inputString) {
+    DateFormat inputFormat = DateFormat('yyyy-MM-dd');
+    DateTime dateTime = inputFormat.parse(inputString);
+    DateFormat outputFormat = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    String formattedDateTime = outputFormat.format(dateTime);
+
+    return DateTime.parse(formattedDateTime);
   }
 }
