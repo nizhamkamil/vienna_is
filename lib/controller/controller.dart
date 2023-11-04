@@ -85,6 +85,30 @@ class Controller extends GetxController {
   TextEditingController namaRuanganController = TextEditingController();
   TextEditingController deskripsiRuanganController = TextEditingController();
 
+  //TextEditingController Jadwal
+  Rx<TextEditingController> jamMulaiJadwalController =
+      TextEditingController().obs;
+  Rx<TextEditingController> jamSelesaiJadwalController =
+      TextEditingController().obs;
+  Rx<TextEditingController> hariJadwalController = TextEditingController().obs;
+  Rx<TextEditingController> idGuruJadwalController =
+      TextEditingController().obs;
+  Rx<TextEditingController> idMuridJadwalController =
+      TextEditingController().obs;
+  Rx<TextEditingController> idKelasJadwalController =
+      TextEditingController().obs;
+  Rx<TextEditingController> idTingkatanJadwalController =
+      TextEditingController().obs;
+  Rx<TextEditingController> idRuanganJadwalController =
+      TextEditingController().obs;
+
+  //Jadwal ID Foreign Key
+  int? idGuruJadwal;
+  int? idMuridJadwal;
+  int? idKelasJadwal;
+  int? idTingkatanJadwal;
+  int? idRuanganJadwal;
+
   //Constant
   List<DropdownMenuItem> dropdownJenisKelamin = [
     const DropdownMenuItem(
@@ -94,6 +118,37 @@ class Controller extends GetxController {
     const DropdownMenuItem(
       value: 'Perempuan',
       child: Text('Perempuan'),
+    ),
+  ];
+
+  List<DropdownMenuItem> dropdownHari = [
+    const DropdownMenuItem(
+      value: 'Senin',
+      child: Text('Senin'),
+    ),
+    const DropdownMenuItem(
+      value: 'Selasa',
+      child: Text('Selasa'),
+    ),
+    const DropdownMenuItem(
+      value: 'Rabu',
+      child: Text('Rabu'),
+    ),
+    const DropdownMenuItem(
+      value: 'Kamis',
+      child: Text('Kamis'),
+    ),
+    const DropdownMenuItem(
+      value: 'Jumat',
+      child: Text('Jumat'),
+    ),
+    const DropdownMenuItem(
+      value: 'Sabtu',
+      child: Text('Sabtu'),
+    ),
+    const DropdownMenuItem(
+      value: 'Minggu',
+      child: Text('Minggu'),
     ),
   ];
 
@@ -261,6 +316,23 @@ class Controller extends GetxController {
     tanggalLahirMuridController.clear();
     tempatLahirMuridController.clear();
     tipePembelajaranMuridController.clear();
+  }
+
+  clearTextEditingControllerJadwal() {
+    jamMulaiJadwalController.value.clear();
+    jamSelesaiJadwalController.value.clear();
+    hariJadwalController.value.clear();
+    idGuruJadwalController.value.clear();
+    idMuridJadwalController.value.clear();
+    idKelasJadwalController.value.clear();
+    idTingkatanJadwalController.value.clear();
+    idRuanganJadwalController.value.clear();
+
+    idGuruJadwal = null;
+    idMuridJadwal = null;
+    idKelasJadwal = null;
+    idTingkatanJadwal = null;
+    idRuanganJadwal = null;
   }
 
   Future<List<Kelas>> fetchKelas() async {
@@ -718,6 +790,14 @@ class Controller extends GetxController {
     return res;
   }
 
+  //Open Edit Ruangan
+  openEditRuangan(PlutoColumnRendererContext rendererContext) {
+    namaRuanganController.text =
+        rendererContext.row.cells['namaRuangan']!.value.toString();
+    deskripsiRuanganController.text =
+        rendererContext.row.cells['deskripsiRuangan']!.value.toString();
+  }
+
   //Update Ruangan
   Future<Ruangan> updateRuangan(int id) async {
     PlutoController plutoController = Get.find();
@@ -794,6 +874,171 @@ class Controller extends GetxController {
     }
   }
   //!END RUANGAN
+
+  //!START JADWAL
+
+  //Add Jadwal
+  Future<Jadwal> addJadwal() async {
+    PlutoController plutoController = Get.find();
+    Jadwal request = Jadwal(
+      idJadwal: null,
+      jamMulai:
+          convertTimeToDateTime(jamMulaiJadwalController.value.text.toString()),
+      jamSelesai: convertTimeToDateTime(
+          jamSelesaiJadwalController.value.text.toString()),
+      hari: hariJadwalController.value.text,
+      idGuru: idGuruJadwal,
+      idMurid: idMuridJadwal,
+      idKelas: idKelasJadwal,
+      idTingkatan: idTingkatanJadwal,
+      idRuangan: idRuanganJadwal,
+    );
+    String jsonRequest = jadwalSingleToJson(request);
+    print(jsonRequest);
+
+    var res = await AppProvider.addJadwal(jsonRequest);
+    if (res.hari != null) {
+      await fetchJadwal();
+      plutoController.refreshPlutoTable(
+        jadwalStateManager!,
+        plutoController.getJadwalRow(jadwalList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Jadwal berhasil ditambahkan',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Jadwal gagal ditambahkan',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+    }
+    return res;
+  }
+
+  openEditJadwal(PlutoColumnRendererContext rendererContext) {
+    jamMulaiJadwalController.value.text =
+        rendererContext.row.cells['jamMulai']!.value.toString();
+    jamSelesaiJadwalController.value.text =
+        rendererContext.row.cells['jamSelesai']!.value.toString();
+    hariJadwalController.value.text =
+        rendererContext.row.cells['hari']!.value.toString();
+    idGuruJadwalController.value.text =
+        rendererContext.row.cells['namaGuru']!.value.toString();
+    idMuridJadwalController.value.text =
+        rendererContext.row.cells['namaMurid']!.value.toString();
+    idKelasJadwalController.value.text =
+        rendererContext.row.cells['namaKelas']!.value.toString();
+    idTingkatanJadwalController.value.text =
+        rendererContext.row.cells['namaTingkatan']!.value.toString();
+    idRuanganJadwalController.value.text =
+        rendererContext.row.cells['namaRuangan']!.value.toString();
+    hariJadwalController.value.text =
+        rendererContext.row.cells['hari']!.value.toString();
+
+    idGuruJadwal = rendererContext.row.cells['idGuru']!.value;
+    idMuridJadwal = rendererContext.row.cells['idMurid']!.value;
+    idKelasJadwal = rendererContext.row.cells['idKelas']!.value;
+    idTingkatanJadwal = rendererContext.row.cells['idTingkatan']!.value;
+    idRuanganJadwal = rendererContext.row.cells['idRuangan']!.value;
+  }
+
+  //DELETE JADWAL
+  Future<String> deleteJadwal(int id) async {
+    PlutoController plutoController = Get.find();
+    var res = await AppProvider.deleteJadwal(id);
+    if (res == 'SUCCESS') {
+      await fetchJadwal();
+      plutoController.refreshPlutoTable(
+        jadwalStateManager!,
+        plutoController.getJadwalRow(jadwalList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Jadwal berhasil dihapus',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+      return 'SUCCESS';
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Jadwal gagal dihapus',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+      return 'FAILED';
+    }
+  }
+
+  //UPDATE JADWAL
+  Future<Jadwal> updateJadwal(int id) async {
+    PlutoController plutoController = Get.find();
+    Jadwal request = Jadwal(
+      idJadwal: null,
+      jamMulai:
+          convertTimeToDateTime(jamMulaiJadwalController.value.text.toString()),
+      jamSelesai: convertTimeToDateTime(
+          jamSelesaiJadwalController.value.text.toString()),
+      hari: hariJadwalController.value.text,
+      idGuru: idGuruJadwal,
+      idMurid: idMuridJadwal,
+      idKelas: idKelasJadwal,
+      idTingkatan: idTingkatanJadwal,
+      idRuangan: idRuanganJadwal,
+    );
+    String jsonRequest = jadwalSingleToJson(request);
+    print(jsonRequest);
+    var res = await AppProvider.updateJadwal(jsonRequest, id);
+    if (res.hari != null) {
+      await fetchJadwal();
+      plutoController.refreshPlutoTable(
+        jadwalStateManager!,
+        plutoController.getJadwalRow(jadwalList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Jadwal berhasil diupdate',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Jadwal gagal diupdate',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+    }
+    return res;
+  }
+
+  //!END JADWAL
 
   checkUserRole() async {
     Future<SharedPreferences> preferences = SharedPreferences.getInstance();
@@ -918,5 +1163,28 @@ class Controller extends GetxController {
     String formattedDateTime = outputFormat.format(dateTime);
 
     return DateTime.parse(formattedDateTime);
+  }
+
+  //EXAMPLE
+  //INPUT(2000-01-01 07:30:00.000Z)
+  //OUTPUT(07:30)
+  String formatDateTimeToHHmm(DateTime dateTime) {
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
+  //EXAMPLE
+  //INPUT(07:30)
+  //OUTPUT(2000-01-01 07:30:00.000Z)
+  DateTime convertTimeToDateTime(String timeString) {
+    final fixedDate = DateTime(2000, 1, 1);
+    final timeParts = timeString.split(':');
+    if (timeParts.length == 2) {
+      final hour = int.tryParse(timeParts[0]) ?? 0;
+      final minute = int.tryParse(timeParts[1]) ?? 0;
+      return fixedDate.add(Duration(hours: hour, minutes: minute));
+    }
+    return fixedDate; // Return a default date if the input is invalid
   }
 }

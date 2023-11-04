@@ -3,6 +3,7 @@ import 'package:pluto_grid/pluto_grid.dart';
 import 'package:vienna_is/controller/controller.dart';
 
 import '../models/guru.dart';
+import '../models/jadwal.dart';
 import '../models/murid.dart';
 import '../models/ruangan.dart';
 
@@ -41,6 +42,35 @@ class PlutoController extends GetxController {
             PlutoCell(value: controller.ruanganList[index].namaRuangan),
         'deskripsiRuangan':
             PlutoCell(value: controller.ruanganList[index].deskripsiRuangan),
+        'action': PlutoCell(value: ''),
+      });
+    });
+  }
+
+  List<PlutoRow> getJadwalRow(List<Jadwal> jadwal) {
+    return List.generate(controller.jadwalList.length, (index) {
+      return PlutoRow(cells: {
+        'idJadwal': PlutoCell(value: controller.jadwalList[index].idJadwal),
+        'jamMulai': PlutoCell(
+            value: controller
+                .formatDateTimeToHHmm(controller.jadwalList[index].jamMulai!)),
+        'jamSelesai': PlutoCell(
+            value: controller.formatDateTimeToHHmm(
+                controller.jadwalList[index].jamSelesai!)),
+        'hari': PlutoCell(value: controller.jadwalList[index].hari),
+        'idGuru': PlutoCell(value: controller.jadwalList[index].idGuru),
+        'namaGuru': PlutoCell(value: controller.jadwalList[index].namaGuru),
+        'idMurid': PlutoCell(value: controller.jadwalList[index].idMurid),
+        'namaMurid': PlutoCell(value: controller.jadwalList[index].namaMurid),
+        'idKelas': PlutoCell(value: controller.jadwalList[index].idKelas),
+        'namaKelas': PlutoCell(value: controller.jadwalList[index].namaKelas),
+        'idTingkatan':
+            PlutoCell(value: controller.jadwalList[index].idTingkatan),
+        'namaTingkatan':
+            PlutoCell(value: controller.jadwalList[index].namaTingkatan),
+        'idRuangan': PlutoCell(value: controller.jadwalList[index].idRuangan),
+        'namaRuangan':
+            PlutoCell(value: controller.jadwalList[index].namaRuangan),
         'action': PlutoCell(value: ''),
       });
     });

@@ -2,82 +2,119 @@
 //
 //     final jadwal = jadwalFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 List<Jadwal> jadwalFromJson(String str) =>
     List<Jadwal>.from(json.decode(str).map((x) => Jadwal.fromJson(x)));
 
+Jadwal jadwalSingleFromJson(String str) => Jadwal.fromJson(json.decode(str));
+
 String jadwalToJson(List<Jadwal> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
+String jadwalSingleToJson(Jadwal data) => json.encode(data.toJson());
+
 class Jadwal {
-  final int idJadwal;
-  final int idRuangan;
-  final int idKelas;
-  final int idTingkatan;
-  final int idGuru;
-  final int idMurid;
-  final dynamic jamMulai;
-  final dynamic jamSelesai;
-  final String hari;
+  final int? idJadwal;
+  final DateTime? jamMulai;
+  final DateTime? jamSelesai;
+  final String? hari;
+  final int? idGuru;
+  final String? namaGuru;
+  final int? idMurid;
+  final String? namaMurid;
+  final int? idKelas;
+  final String? namaKelas;
+  final int? idTingkatan;
+  final String? namaTingkatan;
+  final int? idRuangan;
+  final String? namaRuangan;
 
   Jadwal({
-    required this.idJadwal,
-    required this.idRuangan,
-    required this.idKelas,
-    required this.idTingkatan,
-    required this.idGuru,
-    required this.idMurid,
-    required this.jamMulai,
-    required this.jamSelesai,
-    required this.hari,
+    this.idJadwal,
+    this.jamMulai,
+    this.jamSelesai,
+    this.hari,
+    this.idGuru,
+    this.namaGuru,
+    this.idMurid,
+    this.namaMurid,
+    this.idKelas,
+    this.namaKelas,
+    this.idTingkatan,
+    this.namaTingkatan,
+    this.idRuangan,
+    this.namaRuangan,
   });
 
   Jadwal copyWith({
     int? idJadwal,
-    int? idRuangan,
-    int? idKelas,
-    int? idTingkatan,
-    int? idGuru,
-    int? idMurid,
-    dynamic jamMulai,
-    dynamic jamSelesai,
+    DateTime? jamMulai,
+    DateTime? jamSelesai,
     String? hari,
+    int? idGuru,
+    String? namaGuru,
+    int? idMurid,
+    String? namaMurid,
+    int? idKelas,
+    String? namaKelas,
+    int? idTingkatan,
+    String? namaTingkatan,
+    int? idRuangan,
+    String? namaRuangan,
   }) =>
       Jadwal(
         idJadwal: idJadwal ?? this.idJadwal,
-        idRuangan: idRuangan ?? this.idRuangan,
-        idKelas: idKelas ?? this.idKelas,
-        idTingkatan: idTingkatan ?? this.idTingkatan,
-        idGuru: idGuru ?? this.idGuru,
-        idMurid: idMurid ?? this.idMurid,
         jamMulai: jamMulai ?? this.jamMulai,
         jamSelesai: jamSelesai ?? this.jamSelesai,
         hari: hari ?? this.hari,
+        idGuru: idGuru ?? this.idGuru,
+        namaGuru: namaGuru ?? this.namaGuru,
+        idMurid: idMurid ?? this.idMurid,
+        namaMurid: namaMurid ?? this.namaMurid,
+        idKelas: idKelas ?? this.idKelas,
+        namaKelas: namaKelas ?? this.namaKelas,
+        idTingkatan: idTingkatan ?? this.idTingkatan,
+        namaTingkatan: namaTingkatan ?? this.namaTingkatan,
+        idRuangan: idRuangan ?? this.idRuangan,
+        namaRuangan: namaRuangan ?? this.namaRuangan,
       );
 
   factory Jadwal.fromJson(Map<String, dynamic> json) => Jadwal(
         idJadwal: json["id_jadwal"],
-        idRuangan: json["id_ruangan"],
-        idKelas: json["id_kelas"],
-        idTingkatan: json["id_tingkatan"],
-        idGuru: json["id_guru"],
-        idMurid: json["id_murid"],
-        jamMulai: json["jam_mulai"],
-        jamSelesai: json["jam_selesai"],
+        jamMulai: json["jam_mulai"] == null
+            ? null
+            : DateTime.parse(json["jam_mulai"]),
+        jamSelesai: json["jam_selesai"] == null
+            ? null
+            : DateTime.parse(json["jam_selesai"]),
         hari: json["hari"],
+        idGuru: json["id_guru"],
+        namaGuru: json["nama_guru"],
+        idMurid: json["id_murid"],
+        namaMurid: json["nama_murid"],
+        idKelas: json["id_kelas"],
+        namaKelas: json["nama_kelas"],
+        idTingkatan: json["id_tingkatan"],
+        namaTingkatan: json["nama_tingkatan"],
+        idRuangan: json["id_ruangan"],
+        namaRuangan: json["nama_ruangan"],
       );
 
   Map<String, dynamic> toJson() => {
         "id_jadwal": idJadwal,
-        "id_ruangan": idRuangan,
-        "id_kelas": idKelas,
-        "id_tingkatan": idTingkatan,
-        "id_guru": idGuru,
-        "id_murid": idMurid,
-        "jam_mulai": jamMulai,
-        "jam_selesai": jamSelesai,
+        "jam_mulai": jamMulai?.toIso8601String(),
+        "jam_selesai": jamSelesai?.toIso8601String(),
         "hari": hari,
+        "id_guru": idGuru,
+        "nama_guru": namaGuru,
+        "id_murid": idMurid,
+        "nama_murid": namaMurid,
+        "id_kelas": idKelas,
+        "nama_kelas": namaKelas,
+        "id_tingkatan": idTingkatan,
+        "nama_tingkatan": namaTingkatan,
+        "id_ruangan": idRuangan,
+        "nama_ruangan": namaRuangan,
       };
 }

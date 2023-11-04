@@ -59,6 +59,8 @@ class TabelRuangan extends StatelessWidget {
                   color: Colors.blue,
                 ),
                 onPressed: () {
+                  controller.clearTextEditingControllerRuangan();
+                  controller.openEditRuangan(rendererContext);
                   showFloatingModalBottomSheet(
                     context: context,
                     builder: (context) {

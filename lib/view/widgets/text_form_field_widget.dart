@@ -98,7 +98,15 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
                             DateFormat('yyyy-MM-dd').format(pickedDate!);
                       },
                       icon: Icon(Icons.calendar_month))
-                  : null,
+                  : widget.type == 'time'
+                      ? IconButton(
+                          onPressed: () async {
+                            TimeOfDay? pickedTime = await showTimePicker(
+                                context: context, initialTime: TimeOfDay.now());
+                            widget.textCtrl!.text = pickedTime!.format(context);
+                          },
+                          icon: Icon(Icons.timer))
+                      : null,
           hintText: widget.hintText ?? widget.labelText.tr,
           floatingLabelBehavior: FloatingLabelBehavior.always,
           labelStyle: TextStyle(
