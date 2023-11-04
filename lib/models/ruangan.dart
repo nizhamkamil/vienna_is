@@ -2,24 +2,27 @@
 //
 //     final ruangan = ruanganFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 List<Ruangan> ruanganFromJson(String str) =>
     List<Ruangan>.from(json.decode(str).map((x) => Ruangan.fromJson(x)));
 
+Ruangan ruanganSingleFromJson(String str) => Ruangan.fromJson(json.decode(str));
+
 String ruanganToJson(List<Ruangan> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
+String ruanganSingleToJson(Ruangan data) => json.encode(data.toJson());
+
 class Ruangan {
-  final int idRuangan;
-  final String namaRuangan;
-  final String deskripsiRuangan;
+  final int? idRuangan;
+  final String? namaRuangan;
+  final String? deskripsiRuangan;
 
   Ruangan({
-    required this.idRuangan,
-    required this.namaRuangan,
-    required this.deskripsiRuangan,
+    this.idRuangan,
+    this.namaRuangan,
+    this.deskripsiRuangan,
   });
 
   Ruangan copyWith({

@@ -102,6 +102,16 @@ class AppProvider extends GetConnect {
     }
   }
 
+  static Future<Ruangan> addRuangan(String body) async {
+    var response = await client.post(Uri.parse('$config/ruangan'),
+        body: body, headers: headers);
+    if (response.statusCode == 200) {
+      return ruanganSingleFromJson(response.body);
+    } else {
+      return Ruangan();
+    }
+  }
+
   static Future<String> deleteMurid(int id) async {
     var response = await client.delete(Uri.parse('$config/murid/$id'));
     if (response.statusCode == 200) {
@@ -121,6 +131,16 @@ class AppProvider extends GetConnect {
     }
   }
 
+  static Future<Ruangan> updateRuangan(String body, int id) async {
+    var response = await client.put(Uri.parse('$config/ruangan/$id'),
+        body: body, headers: headers);
+    if (response.statusCode == 200) {
+      return ruanganSingleFromJson(response.body);
+    } else {
+      return Ruangan();
+    }
+  }
+
   static Future<Guru> updateGuru(String body, int id) async {
     var response = await client.put(Uri.parse('$config/guru/$id'),
         body: body, headers: headers);
@@ -133,6 +153,15 @@ class AppProvider extends GetConnect {
 
   static Future<String> deleteGuru(int id) async {
     var response = await client.delete(Uri.parse('$config/guru/$id'));
+    if (response.statusCode == 200) {
+      return 'SUCCESS';
+    } else {
+      return 'FAILED';
+    }
+  }
+
+  static Future<String> deleteRuangan(int id) async {
+    var response = await client.delete(Uri.parse('$config/ruangan/$id'));
     if (response.statusCode == 200) {
       return 'SUCCESS';
     } else {

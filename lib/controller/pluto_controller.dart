@@ -4,6 +4,7 @@ import 'package:vienna_is/controller/controller.dart';
 
 import '../models/guru.dart';
 import '../models/murid.dart';
+import '../models/ruangan.dart';
 
 class PlutoController extends GetxController {
   Controller controller = Get.find();
@@ -29,6 +30,19 @@ class PlutoController extends GetxController {
           'action': PlutoCell(value: ''),
         },
       );
+    });
+  }
+
+  List<PlutoRow> getRuanganRow(List<Ruangan> ruangan) {
+    return List.generate(controller.ruanganList.length, (index) {
+      return PlutoRow(cells: {
+        'idRuangan': PlutoCell(value: controller.ruanganList[index].idRuangan),
+        'namaRuangan':
+            PlutoCell(value: controller.ruanganList[index].namaRuangan),
+        'deskripsiRuangan':
+            PlutoCell(value: controller.ruanganList[index].deskripsiRuangan),
+        'action': PlutoCell(value: ''),
+      });
     });
   }
 

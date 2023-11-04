@@ -81,6 +81,10 @@ class Controller extends GetxController {
   TextEditingController tipePembelajaranMuridController =
       TextEditingController();
 
+  //TextEditingController Ruangan
+  TextEditingController namaRuanganController = TextEditingController();
+  TextEditingController deskripsiRuanganController = TextEditingController();
+
   //Constant
   List<DropdownMenuItem> dropdownJenisKelamin = [
     const DropdownMenuItem(
@@ -234,6 +238,11 @@ class Controller extends GetxController {
     kewarganegaraanController.clear();
     jenisKelaminController.clear();
     statusNikahController.clear();
+  }
+
+  clearTextEditingControllerRuangan() {
+    namaRuanganController.clear();
+    deskripsiRuanganController.clear();
   }
 
   clearTextEditingControllerMurid() {
@@ -666,6 +675,125 @@ class Controller extends GetxController {
   }
 
   //!END GURU
+
+  //!START RUANGAN
+  Future<Ruangan> addRuangan() async {
+    PlutoController plutoController = Get.find();
+    Ruangan request = Ruangan(
+      idRuangan: null,
+      namaRuangan: namaRuanganController.text,
+      deskripsiRuangan: deskripsiRuanganController.text,
+    );
+    String jsonRequest = ruanganSingleToJson(request);
+    print(jsonRequest);
+
+    var res = await AppProvider.addRuangan(jsonRequest);
+    if (res.namaRuangan != null) {
+      await fetchRuangan();
+      plutoController.refreshPlutoTable(
+        ruanganStateManager!,
+        plutoController.getRuanganRow(ruanganList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Ruangan berhasil ditambahkan',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Ruangan gagal ditambahkan',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+    }
+    return res;
+  }
+
+  //Update Ruangan
+  Future<Ruangan> updateRuangan(int id) async {
+    PlutoController plutoController = Get.find();
+    Ruangan request = Ruangan(
+      idRuangan: id,
+      namaRuangan: namaRuanganController.text,
+      deskripsiRuangan: deskripsiRuanganController.text,
+    );
+    String jsonRequest = ruanganSingleToJson(request);
+    print(jsonRequest);
+    var res = await AppProvider.updateRuangan(jsonRequest, id);
+    if (res.namaRuangan != null) {
+      await fetchRuangan();
+      plutoController.refreshPlutoTable(
+        ruanganStateManager!,
+        plutoController.getRuanganRow(ruanganList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Ruangan berhasil diupdate',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Ruangan gagal diupdate',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+    }
+    return res;
+  }
+
+  //Delete Ruangan
+  Future<String> deleteRuangan(int id) async {
+    PlutoController plutoController = Get.find();
+    var res = await AppProvider.deleteRuangan(id);
+    if (res == 'SUCCESS') {
+      await fetchRuangan();
+      plutoController.refreshPlutoTable(
+        ruanganStateManager!,
+        plutoController.getRuanganRow(ruanganList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Ruangan berhasil dihapus',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+      return 'SUCCESS';
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Ruangan gagal dihapus',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+      return 'FAILED';
+    }
+  }
+  //!END RUANGAN
 
   checkUserRole() async {
     Future<SharedPreferences> preferences = SharedPreferences.getInstance();

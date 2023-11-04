@@ -19,6 +19,7 @@ class TextFormFieldWidget extends StatefulWidget {
       this.validator,
       this.maxLength,
       this.maxLines,
+      this.minLines,
       this.customValidator,
       this.readOnly,
       required this.obscureText,
@@ -37,6 +38,7 @@ class TextFormFieldWidget extends StatefulWidget {
   String? Function(String?)? customValidator;
   int? maxLength;
   int? maxLines;
+  int? minLines;
   bool? readOnly = false;
   bool obscureText = false;
   Icon? prefixIcon;
@@ -66,7 +68,7 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
                 FocusScope.of(context).requestFocus(FocusNode());
               }
             : () {},
-        minLines: 1,
+        minLines: widget.minLines ?? 1,
         maxLines: widget.maxLines ?? 5,
         maxLength: widget.maxLength,
         keyboardType: widget.textInputType,
