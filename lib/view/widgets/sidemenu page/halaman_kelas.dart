@@ -69,9 +69,9 @@ class HalamanKelas extends StatelessWidget {
                 color: kBrownGoldColorSecondary,
               ),
               onPress: () {
-                // showFilter.value = !showFilter.value;
-                // controller.ruanganStateManager
-                //     ?.setShowColumnFilter(showFilter.value);
+                showFilter.value = !showFilter.value;
+                controller.kelasStateManager
+                    ?.setShowColumnFilter(showFilter.value);
               },
               textWidget: const TextWidget(
                 text: 'Show Filter',
@@ -97,7 +97,7 @@ class HalamanKelas extends StatelessWidget {
                 showFloatingModalBottomSheet(
                   context: context,
                   builder: (context) {
-                    controller.clearTextEditingControllerRuangan();
+                    controller.clearTextEditingControllerKelas();
                     return ModalPopUp(
                       onPressed: () async {
                         if (controller.formKeyGuru.currentState!.validate()) {

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:get/get.dart';
 import 'package:http/http.dart' as client;
 import 'package:image_picker/image_picker.dart';
@@ -95,25 +97,47 @@ class AppProvider extends GetConnect {
     });
   }
 
-  static Future<Kelas> addKelas(String body, RxList<XFile?> file) async {
-    try {
-      var response2 = await client.MultipartRequest(
-          "POST", Uri.parse('$config/kelas_foto/upload'));
+  static Future<Uint8List> getFoto(String path) {
+    print('$config/assets/$path');
+    return client.get(Uri.parse('$config/assets/$path')).then((response) {
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        return Uint8List(0);
+      }
+    });
+  }
 
-      for (var i = 0; i < file.length; i++) {
-        List<int> fileBytes = await file[i]!.readAsBytes();
+  static Future<Kelas> addKelas(String body, RxList<XFile?> files) async {
+    try {
+      var uploadFailed = false;
+      var response2 = await client.MultipartRequest(
+        "POST",
+        Uri.parse('$config/kelas_foto/upload'),
+      );
+
+      for (var i = 0; i < files.length; i++) {
+        List<int> fileBytes = await files[i]!.readAsBytes();
         var multipartFile = client.MultipartFile.fromBytes(
           'photo',
           fileBytes,
-          filename: file[i]!.name,
+          filename: files[i]!.name,
         );
         response2.files.add(multipartFile);
       }
+
       var streamedResponse = await response2.send();
       var res = await client.Response.fromStream(streamedResponse);
+
       if (res.statusCode != 200) {
-        throw Exception('Failed to upload image');
+        uploadFailed = true;
+        print('Failed to upload image: ${res.body}');
       }
+
+      if (uploadFailed) {
+        throw Exception('One or more images failed to upload');
+      }
+
       var response = await client.post(Uri.parse('$config/kelas'),
           body: body, headers: headers);
 
@@ -177,6 +201,16 @@ class AppProvider extends GetConnect {
     }
   }
 
+  static Future<Pendaftaran> updatePendaftaran(String body, int id) async {
+    var response = await client.put(Uri.parse('$config/pendaftaran/$id'),
+        body: body, headers: headers);
+    if (response.statusCode == 200) {
+      return pendaftaranSingleFromJson(response.body);
+    } else {
+      return Pendaftaran();
+    }
+  }
+
   static Future<Ruangan> updateRuangan(String body, int id) async {
     var response = await client.put(Uri.parse('$config/ruangan/$id'),
         body: body, headers: headers);
@@ -199,6 +233,48 @@ class AppProvider extends GetConnect {
     }
   }
 
+  static Future<Kelas> updateKelas(
+      String body, KelasKomplit kelasKomplit, RxList<XFile?> file) async {
+    try {
+      //DELETE ALL THE FOTO FIRST BEFORE UPLOADING NEW ONES
+      for (var i = 0; i < kelasKomplit.kelasFoto.length; i++) {
+        await deleteKelasFoto(kelasKomplit.kelasFoto[i].idKelasFoto!);
+      }
+
+      var response2 = client.MultipartRequest(
+          "POST", Uri.parse('$config/kelas_foto/upload'));
+
+      for (var i = 0; i < file.length; i++) {
+        List<int> fileBytes = await file[i]!.readAsBytes();
+        var multipartFile = client.MultipartFile.fromBytes(
+          'photo',
+          fileBytes,
+          filename: file[i]!.name,
+        );
+        response2.files.add(multipartFile);
+      }
+      var streamedResponse = await response2.send();
+      var res = await client.Response.fromStream(streamedResponse);
+      if (res.statusCode != 200) {
+        throw Exception('Failed to upload image');
+      }
+
+      var response = await client.put(
+          Uri.parse('$config/kelas/${kelasKomplit.idKelas}'),
+          body: body,
+          headers: headers);
+
+      if (response.statusCode == 200) {
+        print('inilah body ${response.body}');
+        return kelasSingleFromJson(response.body);
+      } else {
+        return Kelas();
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
   static Future<Guru> updateGuru(String body, int id) async {
     var response = await client.put(Uri.parse('$config/guru/$id'),
         body: body, headers: headers);
@@ -211,6 +287,33 @@ class AppProvider extends GetConnect {
 
   static Future<String> deleteGuru(int id) async {
     var response = await client.delete(Uri.parse('$config/guru/$id'));
+    if (response.statusCode == 200) {
+      return 'SUCCESS';
+    } else {
+      return 'FAILED';
+    }
+  }
+
+  static Future<String> deletePendaftaran(int id) async {
+    var response = await client.delete(Uri.parse('$config/pendaftaran/$id'));
+    if (response.statusCode == 200) {
+      return 'SUCCESS';
+    } else {
+      return 'FAILED';
+    }
+  }
+
+  static Future<String> deleteKelas(int id) async {
+    var response = await client.delete(Uri.parse('$config/kelas/$id'));
+    if (response.statusCode == 200) {
+      return 'SUCCESS';
+    } else {
+      return 'FAILED';
+    }
+  }
+
+  static Future<String> deleteKelasFoto(int id) async {
+    var response = await client.delete(Uri.parse('$config/kelas_foto/$id'));
     if (response.statusCode == 200) {
       return 'SUCCESS';
     } else {

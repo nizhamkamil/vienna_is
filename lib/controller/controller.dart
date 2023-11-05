@@ -56,6 +56,7 @@ class Controller extends GetxController {
   RxList<XFile?> imageXFile = <XFile?>[].obs;
   RxList<File?> imageFile = <File?>[].obs;
   RxInt imageIndex = 0.obs;
+  RxList<KelasFoto> kelasFotoListById = <KelasFoto>[].obs;
 
   //TextEditingController Guru
   TextEditingController namaController = TextEditingController();
@@ -114,6 +115,21 @@ class Controller extends GetxController {
   TextEditingController deskripsiKelasController = TextEditingController();
   TextEditingController namaFotoKelasController = TextEditingController();
   TextEditingController pathFotoKelasController = TextEditingController();
+
+  //TextEditingController Pendaftaran
+  Rx<TextEditingController> muridPendaftaranController =
+      TextEditingController().obs;
+  Rx<TextEditingController> kelasPendaftaranController =
+      TextEditingController().obs;
+  Rx<TextEditingController> statusPendaftaranController =
+      TextEditingController().obs;
+  Rx<TextEditingController> tanggalPendaftaranController =
+      TextEditingController().obs;
+
+  //Pendaftaran ID Foreign Key
+  int? idMuridPendaftaran;
+  int? idKelasPendaftaran;
+  int? idAdminPendaftaran;
 
   //Jadwal ID Foreign Key
   int? idGuruJadwal;
@@ -308,6 +324,12 @@ class Controller extends GetxController {
     statusNikahController.clear();
   }
 
+  clearTextEditingControllerKelas() {
+    namaKelasController.clear();
+    deskripsiKelasController.clear();
+    imageXFile.clear();
+  }
+
   clearTextEditingControllerRuangan() {
     namaRuanganController.clear();
     deskripsiRuanganController.clear();
@@ -360,7 +382,7 @@ class Controller extends GetxController {
           kelasFoto: await fetchKelasFotoById(row.idKelas!),
         )
     ];
-    print(kelasKomplitToJson(kelasKomplitList));
+
     return res;
   }
 
@@ -1073,13 +1095,90 @@ class Controller extends GetxController {
 
   //!START KELAS
 
+  openEditKelas(PlutoColumnRendererContext rendererContext) async {
+    imageXFile.clear();
+    namaKelasController.text =
+        rendererContext.row.cells['namaKelas']!.value.toString();
+    deskripsiKelasController.text =
+        rendererContext.row.cells['deskripsiKelas']!.value.toString();
+    var res =
+        await fetchKelasFotoById(rendererContext.row.cells['idKelas']!.value);
+    for (var i = 0; i < res.length; i++) {
+      final bodyBytes = await AppProvider.getFoto(res[i].pathFoto!);
+      var singleXFile = XFile.fromData(bodyBytes, name: res[i].pathFoto!);
+      print(singleXFile.name);
+      imageXFile.add(singleXFile);
+    }
+    print('baiklah');
+    for (var i = 0; i < imageXFile.length; i++) {
+      print(imageXFile[i]!.name);
+    }
+  }
+
+  Future<Kelas> updateKelas(int id) async {
+    PlutoController plutoController = Get.find();
+
+    Kelas request = Kelas(
+      idKelas: null,
+      namaKelas: namaKelasController.text,
+      deskripsiKelas: deskripsiKelasController.text,
+    );
+    String jsonRequest = kelasSingleToJson(request);
+    KelasKomplit selectedKelasKomplit =
+        kelasKomplitList.where((e) => e.idKelas == id).first;
+    var res = await AppProvider.updateKelas(
+        jsonRequest, selectedKelasKomplit, imageXFile);
+
+    await fetchKelas();
+    print('imageXFile length: ${imageXFile.length}');
+    for (var i = 0; i < imageXFile.length; i++) {
+      KelasFoto requestFotoSingle = KelasFoto(
+          idKelasFoto: null,
+          namaFoto: '',
+          pathFoto: imageXFile[i]!.name,
+          idKelas: id);
+      String jsonRequestFoto = kelasFotoSingleToJson(requestFotoSingle);
+      print(jsonRequestFoto);
+      await AppProvider.addKelasFoto(jsonRequestFoto);
+    }
+    await fetchKelas();
+    plutoController.refreshPlutoTable(
+      kelasStateManager!,
+      plutoController.getKelasRow(kelasKomplitList),
+    );
+    print(res.deskripsiKelas);
+    print(res.namaKelas);
+    print(res.idKelas);
+    if (res.namaKelas != null) {
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Kelas berhasil diupdate',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Kelas gagal diupdate',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+    }
+    return res;
+  }
+
   Future addImages() async {
     final returnedImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (returnedImage != null) {
       imageXFile.add(returnedImage);
-
-      print(imageXFile[0]!.name);
     }
   }
 
@@ -1139,7 +1238,130 @@ class Controller extends GetxController {
     imageXFile.removeAt(index);
   }
 
+  Future<String> deleteKelas(int id) async {
+    PlutoController plutoController = Get.find();
+    var res = await AppProvider.deleteKelas(id);
+    if (res == 'SUCCESS') {
+      fetchKelas();
+      plutoController.refreshPlutoTable(
+        kelasStateManager!,
+        plutoController.getKelasRow(kelasKomplitList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Kelas berhasil dihapus',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+      return 'SUCCESS';
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Kelas gagal dihapus',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+      return 'FAILED';
+    }
+  }
+
   //!END KELAS
+
+  //!START PENDAFTARAN
+  openEditPendaftaran(PlutoColumnRendererContext rendererContext) {
+    idMuridPendaftaran = rendererContext.row.cells['idMurid']!.value;
+    idKelasPendaftaran = rendererContext.row.cells['idKelas']!.value;
+    idAdminPendaftaran = rendererContext.row.cells['idAdmin']!.value;
+    kelasPendaftaranController.value.text =
+        rendererContext.row.cells['namaKelas']!.value.toString();
+    statusPendaftaranController.value.text =
+        rendererContext.row.cells['statusPendaftaran']!.value.toString();
+  }
+
+  Future<Pendaftaran> updatePendaftaran(int id) async {
+    PlutoController plutoController = Get.find();
+    Pendaftaran request = Pendaftaran(
+      idPendaftaran: null,
+      idMurid: idMuridPendaftaran,
+      idKelas: idKelasPendaftaran,
+      idAdmin: idAdminPendaftaran,
+      statusPendaftaran: statusPendaftaranController.value.text,
+    );
+    String jsonRequest = pendaftaranSingleToJson(request);
+    print(jsonRequest);
+    var res = await AppProvider.updatePendaftaran(jsonRequest, id);
+    if (res.statusPendaftaran != null) {
+      await fetchPendaftaran();
+      plutoController.refreshPlutoTable(
+        pendaftaranStateManager!,
+        plutoController.getPendaftaranRow(pendaftaranList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Pendaftaran berhasil diupdate',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Pendaftaran gagal diupdate',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+    }
+    return res;
+  }
+
+  Future<String> deletePendaftaran(int id) async {
+    PlutoController plutoController = Get.find();
+    var res = await AppProvider.deletePendaftaran(id);
+    if (res == 'SUCCESS') {
+      await fetchPendaftaran();
+      plutoController.refreshPlutoTable(
+        pendaftaranStateManager!,
+        plutoController.getPendaftaranRow(pendaftaranList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Pendaftaran berhasil dihapus',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+      return 'SUCCESS';
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Pendaftaran gagal dihapus',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+      return 'FAILED';
+    }
+  }
+
+  //!END PENDAFTARAN
 
   logout() async {
     Future<SharedPreferences> preferences = SharedPreferences.getInstance();

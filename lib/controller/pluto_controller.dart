@@ -6,6 +6,7 @@ import '../models/guru.dart';
 import '../models/jadwal.dart';
 import '../models/kelas_complete.dart';
 import '../models/murid.dart';
+import '../models/pendaftaran.dart';
 import '../models/ruangan.dart';
 
 class PlutoController extends GetxController {
@@ -87,6 +88,29 @@ class PlutoController extends GetxController {
             PlutoCell(value: controller.kelasKomplitList[index].deskripsiKelas),
         'fotoKelas': PlutoCell(
             value: controller.kelasKomplitList[index].kelasFoto[0].pathFoto),
+        'action': PlutoCell(value: ''),
+      });
+    });
+  }
+
+  List<PlutoRow> getPendaftaranRow(List<Pendaftaran> pendaftaran) {
+    return List.generate(controller.pendaftaranList.length, (index) {
+      return PlutoRow(cells: {
+        'idPendaftaran':
+            PlutoCell(value: controller.pendaftaranList[index].idPendaftaran),
+        'idMurid': PlutoCell(value: controller.pendaftaranList[index].idMurid),
+        'namaMurid':
+            PlutoCell(value: controller.pendaftaranList[index].namaMurid),
+        'idAdmin': PlutoCell(value: controller.pendaftaranList[index].idAdmin),
+        'namaAdmin':
+            PlutoCell(value: controller.pendaftaranList[index].namaAdmin),
+        'idKelas': PlutoCell(value: controller.pendaftaranList[index].idKelas),
+        'namaKelas':
+            PlutoCell(value: controller.pendaftaranList[index].namaKelas),
+        'tanggalPendaftaran': PlutoCell(
+            value: controller.pendaftaranList[index].tanggalPendaftaran),
+        'statusPendaftaran': PlutoCell(
+            value: controller.pendaftaranList[index].statusPendaftaran),
         'action': PlutoCell(value: ''),
       });
     });
