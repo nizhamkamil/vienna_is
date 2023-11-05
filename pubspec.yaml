@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   auto_size_text: ^3.0.0
+  carousel_slider: ^4.2.1
   flutter:
     sdk: flutter
   flutter_secure_storage: ^8.1.0
@@ -17,6 +18,7 @@ dependencies:
   getwidget: ^4.0.0
   google_fonts: ^4.0.4
   http: ^0.13.6
+  image_picker: ^1.0.4
   intl: ^0.18.1
   lottie: ^2.3.2
   modal_bottom_sheet: ^2.1.2

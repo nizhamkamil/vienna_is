@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:http/http.dart' as client;
+import 'package:image_picker/image_picker.dart';
 import 'package:vienna_is/models/admin.dart';
 import 'package:vienna_is/models/guru.dart';
 import 'package:vienna_is/models/jadwal.dart';
@@ -79,6 +80,50 @@ class AppProvider extends GetConnect {
       return adminFromJson(response.body);
     } else {
       return Admin();
+    }
+  }
+
+  static Future<KelasFoto> addKelasFoto(String body) {
+    return client
+        .post(Uri.parse('$config/kelas_foto'), body: body, headers: headers)
+        .then((response) {
+      if (response.statusCode == 200) {
+        return kelasFotoSingleFromJson(response.body);
+      } else {
+        return KelasFoto();
+      }
+    });
+  }
+
+  static Future<Kelas> addKelas(String body, RxList<XFile?> file) async {
+    try {
+      var response2 = await client.MultipartRequest(
+          "POST", Uri.parse('$config/kelas_foto/upload'));
+
+      for (var i = 0; i < file.length; i++) {
+        List<int> fileBytes = await file[i]!.readAsBytes();
+        var multipartFile = client.MultipartFile.fromBytes(
+          'photo',
+          fileBytes,
+          filename: file[i]!.name,
+        );
+        response2.files.add(multipartFile);
+      }
+      var streamedResponse = await response2.send();
+      var res = await client.Response.fromStream(streamedResponse);
+      if (res.statusCode != 200) {
+        throw Exception('Failed to upload image');
+      }
+      var response = await client.post(Uri.parse('$config/kelas'),
+          body: body, headers: headers);
+
+      if (response.statusCode == 200) {
+        return kelasSingleFromJson(response.body);
+      } else {
+        return Kelas();
+      }
+    } catch (e) {
+      throw Exception(e);
     }
   }
 

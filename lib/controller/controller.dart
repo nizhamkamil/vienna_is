@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -49,6 +51,11 @@ class Controller extends GetxController {
 
   //Key Form
   GlobalKey<FormState> formKeyGuru = GlobalKey<FormState>();
+
+  //Image File
+  RxList<XFile?> imageXFile = <XFile?>[].obs;
+  RxList<File?> imageFile = <File?>[].obs;
+  RxInt imageIndex = 0.obs;
 
   //TextEditingController Guru
   TextEditingController namaController = TextEditingController();
@@ -101,6 +108,12 @@ class Controller extends GetxController {
       TextEditingController().obs;
   Rx<TextEditingController> idRuanganJadwalController =
       TextEditingController().obs;
+
+  //TextEditingController Kelas
+  TextEditingController namaKelasController = TextEditingController();
+  TextEditingController deskripsiKelasController = TextEditingController();
+  TextEditingController namaFotoKelasController = TextEditingController();
+  TextEditingController pathFotoKelasController = TextEditingController();
 
   //Jadwal ID Foreign Key
   int? idGuruJadwal;
@@ -341,10 +354,10 @@ class Controller extends GetxController {
     kelasKomplitList.value = <KelasKomplit>[
       for (var row in kelasList)
         KelasKomplit(
-          idKelas: row.idKelas,
-          namaKelas: row.namaKelas,
-          deskripsiKelas: row.deskripsiKelas,
-          kelasFoto: await fetchKelasFotoById(row.idKelas),
+          idKelas: row.idKelas!,
+          namaKelas: row.namaKelas!,
+          deskripsiKelas: row.deskripsiKelas!,
+          kelasFoto: await fetchKelasFotoById(row.idKelas!),
         )
     ];
     print(kelasKomplitToJson(kelasKomplitList));
@@ -1057,6 +1070,76 @@ class Controller extends GetxController {
       return 'Admin';
     }
   }
+
+  //!START KELAS
+
+  Future addImages() async {
+    final returnedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (returnedImage != null) {
+      imageXFile.add(returnedImage);
+
+      print(imageXFile[0]!.name);
+    }
+  }
+
+  Future<Kelas> addKelas() async {
+    PlutoController plutoController = Get.find();
+
+    Kelas request = Kelas(
+      idKelas: null,
+      namaKelas: namaKelasController.text,
+      deskripsiKelas: deskripsiKelasController.text,
+    );
+    String jsonRequest = kelasSingleToJson(request);
+
+    var res = await AppProvider.addKelas(jsonRequest, imageXFile);
+    if (res.namaKelas != null) {
+      await fetchKelas();
+      for (var i = 0; i < imageXFile.length; i++) {
+        KelasFoto requestFotoSingle = KelasFoto(
+            idKelasFoto: null,
+            namaFoto: '',
+            pathFoto: imageXFile[i]!.name,
+            idKelas: kelasKomplitList.last.idKelas);
+        String jsonRequestFoto = kelasFotoSingleToJson(requestFotoSingle);
+        print(jsonRequestFoto);
+        await AppProvider.addKelasFoto(jsonRequestFoto);
+      }
+      await fetchKelas();
+      plutoController.refreshPlutoTable(
+        kelasStateManager!,
+        plutoController.getKelasRow(kelasKomplitList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Kelas berhasil ditambahkan',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Kelas gagal ditambahkan',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        colorText: Colors.white,
+      );
+    }
+    return res;
+  }
+
+  Future deleteImages(int index) async {
+    imageXFile.removeAt(index);
+  }
+
+  //!END KELAS
 
   logout() async {
     Future<SharedPreferences> preferences = SharedPreferences.getInstance();

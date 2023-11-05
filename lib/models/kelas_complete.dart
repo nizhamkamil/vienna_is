@@ -6,8 +6,13 @@ import 'dart:convert';
 List<KelasKomplit> kelasKomplitFromJson(String str) => List<KelasKomplit>.from(
     json.decode(str).map((x) => KelasKomplit.fromJson(x)));
 
+KelasFoto kelasFotoSingleFromJson(String str) =>
+    KelasFoto.fromJson(json.decode(str));
+
 String kelasKomplitToJson(List<KelasKomplit> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
+String kelasFotoSingleToJson(KelasFoto data) => json.encode(data.toJson());
 
 List<KelasFoto> kelasFotoFromJson(String str) =>
     List<KelasFoto>.from(json.decode(str).map((x) => KelasFoto.fromJson(x)));
@@ -58,16 +63,16 @@ class KelasKomplit {
 }
 
 class KelasFoto {
-  final int idKelasFoto;
-  final String namaFoto;
-  final String pathFoto;
-  final int idKelas;
+  final int? idKelasFoto;
+  final String? namaFoto;
+  final String? pathFoto;
+  final int? idKelas;
 
   KelasFoto({
-    required this.idKelasFoto,
-    required this.namaFoto,
-    required this.pathFoto,
-    required this.idKelas,
+    this.idKelasFoto,
+    this.namaFoto,
+    this.pathFoto,
+    this.idKelas,
   });
 
   KelasFoto copyWith({

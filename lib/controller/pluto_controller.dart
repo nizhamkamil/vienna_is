@@ -4,6 +4,7 @@ import 'package:vienna_is/controller/controller.dart';
 
 import '../models/guru.dart';
 import '../models/jadwal.dart';
+import '../models/kelas_complete.dart';
 import '../models/murid.dart';
 import '../models/ruangan.dart';
 
@@ -71,6 +72,21 @@ class PlutoController extends GetxController {
         'idRuangan': PlutoCell(value: controller.jadwalList[index].idRuangan),
         'namaRuangan':
             PlutoCell(value: controller.jadwalList[index].namaRuangan),
+        'action': PlutoCell(value: ''),
+      });
+    });
+  }
+
+  List<PlutoRow> getKelasRow(List<KelasKomplit> kelas) {
+    return List.generate(controller.kelasKomplitList.length, (index) {
+      return PlutoRow(cells: {
+        'idKelas': PlutoCell(value: controller.kelasKomplitList[index].idKelas),
+        'namaKelas':
+            PlutoCell(value: controller.kelasKomplitList[index].namaKelas),
+        'deskripsiKelas':
+            PlutoCell(value: controller.kelasKomplitList[index].deskripsiKelas),
+        'fotoKelas': PlutoCell(
+            value: controller.kelasKomplitList[index].kelasFoto[0].pathFoto),
         'action': PlutoCell(value: ''),
       });
     });

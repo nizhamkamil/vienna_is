@@ -8,18 +8,22 @@ import 'dart:convert';
 List<Kelas> kelasFromJson(String str) =>
     List<Kelas>.from(json.decode(str).map((x) => Kelas.fromJson(x)));
 
+Kelas kelasSingleFromJson(String str) => Kelas.fromJson(json.decode(str));
+
 String kelasToJson(List<Kelas> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
+String kelasSingleToJson(Kelas data) => json.encode(data.toJson());
+
 class Kelas {
-  final int idKelas;
-  final String namaKelas;
-  final String deskripsiKelas;
+  final int? idKelas;
+  final String? namaKelas;
+  final String? deskripsiKelas;
 
   Kelas({
-    required this.idKelas,
-    required this.namaKelas,
-    required this.deskripsiKelas,
+    this.idKelas,
+    this.namaKelas,
+    this.deskripsiKelas,
   });
 
   Kelas copyWith({
