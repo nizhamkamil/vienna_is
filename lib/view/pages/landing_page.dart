@@ -1,12 +1,11 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, must_be_immutable
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getwidget/components/card/gf_card.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:vienna_is/config/theme.dart';
-import 'package:vienna_is/models/kelas.dart';
-import 'package:vienna_is/models/kelas_complete.dart';
+
 import 'package:vienna_is/view/widgets/appbar_widget.dart';
 import 'package:vienna_is/view/widgets/button.dart';
 import 'package:vienna_is/view/widgets/text.dart';

@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final murid = muridFromJson(jsonString);
-
 import 'dart:convert';
 
 List<Murid> muridFromJson(String str) =>

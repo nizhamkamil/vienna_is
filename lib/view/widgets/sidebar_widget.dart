@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidebarx/sidebarx.dart';
 import 'package:vienna_is/config/theme.dart';
 import 'package:vienna_is/view/widgets/sidemenu%20page/halaman_guru.dart';
@@ -13,12 +12,13 @@ import 'package:vienna_is/view/widgets/sidemenu%20page/halaman_murid.dart';
 import 'package:vienna_is/view/widgets/sidemenu%20page/halaman_pendaftaran.dart';
 import 'package:vienna_is/view/widgets/sidemenu%20page/halaman_pendaftaran_admin.dart';
 import 'package:vienna_is/view/widgets/sidemenu%20page/halaman_ruangan.dart';
-import 'package:vienna_is/view/widgets/sidemenu%20page/halaman_ujian.dart';
+import 'package:vienna_is/view/widgets/sidemenu%20page/halaman_ujian_admin.dart';
 import 'package:vienna_is/view/widgets/sidemenu%20page/halaman_utama.dart';
 import 'package:vienna_is/view/widgets/sidemenu%20page/halaman_utama_admin.dart';
 import 'package:vienna_is/view/widgets/text.dart';
 
 import '../../controller/controller.dart';
+import 'sidemenu page/halaman_ujian.dart';
 
 class SidebarWidget extends StatefulWidget {
   SidebarWidget({
@@ -229,7 +229,7 @@ class ScreenNavigation extends StatelessWidget {
                 case 6:
                   return HalamanPendaftaranAdmin();
                 case 7:
-                  return HalamanUjian();
+                  return HalamanUjianAdmin();
                 default:
                   return Center(child: TextWidget(text: 'Home'));
               }

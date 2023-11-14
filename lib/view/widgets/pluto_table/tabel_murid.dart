@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, must_be_immutable
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -127,50 +127,55 @@ class TabelMurid extends StatelessWidget {
         title: 'Action',
         field: 'action',
         type: PlutoColumnType.text(),
+        hide: controller.userGuru.isNotEmpty,
         backgroundColor: kAccentBrownGoldColor,
         renderer: (rendererContext) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                icon: Icon(
-                  Icons.edit,
-                  color: Colors.blue,
-                ),
-                onPressed: () {
-                  showFloatingModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      controller.clearTextEditingControllerMurid();
-                      controller.openEditMurid(rendererContext);
-                      return editModal(context, rendererContext);
-                    },
-                  );
-                },
-              ),
-              IconButton(
-                onPressed: () {
-                  showDialog(
+          return Visibility(
+            visible: controller.userGuru.isEmpty,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.edit,
+                    color: Colors.blue,
+                  ),
+                  onPressed: () {
+                    showFloatingModalBottomSheet(
                       context: context,
                       builder: (context) {
-                        return AlertDialogWidget(
-                          onPress: () async {
-                            await controller.deleteMurid(
-                                rendererContext.row.cells['idMurid']!.value);
-                            plutoController.refreshPlutoTable(
-                              controller.muridStateManager!,
-                              plutoController.getMuridRow(controller.muridList),
-                            );
-                          },
-                        );
-                      });
-                },
-                icon: Icon(
-                  Icons.delete,
-                  color: Colors.red,
+                        controller.clearTextEditingControllerMurid();
+                        controller.openEditMurid(rendererContext);
+                        return editModal(context, rendererContext);
+                      },
+                    );
+                  },
                 ),
-              )
-            ],
+                IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialogWidget(
+                            onPress: () async {
+                              await controller.deleteMurid(
+                                  rendererContext.row.cells['idMurid']!.value);
+                              plutoController.refreshPlutoTable(
+                                controller.muridStateManager!,
+                                plutoController
+                                    .getMuridRow(controller.muridList),
+                              );
+                            },
+                          );
+                        });
+                  },
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  ),
+                )
+              ],
+            ),
           );
         },
       )

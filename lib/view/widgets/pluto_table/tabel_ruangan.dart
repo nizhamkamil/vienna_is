@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, must_be_immutable
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +12,6 @@ import 'package:vienna_is/controller/pluto_controller.dart';
 import '../alert_dialog_widget.dart';
 import '../floating_modal.dart';
 import '../modal_pop_up.dart';
-import '../text.dart';
 import '../text_form_field_widget.dart';
 
 class TabelRuangan extends StatelessWidget {

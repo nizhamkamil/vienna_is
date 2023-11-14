@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, must_be_immutable
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -74,97 +74,101 @@ class HalamanMurid extends StatelessWidget {
               SizedBox(
                 width: 30,
               ),
-              BtnWidget(
-                radius: 4,
-                height: 40,
-                btnColor: kBrownGoldColorSecondary,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 2,
-                    blurRadius: 2,
-                  )
-                ],
-                icon: Icon(Icons.add),
-                onPress: () {
-                  showFloatingModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        controller.clearTextEditingControllerMurid();
-                        return ModalPopUp(
-                          onPressed: () async {
-                            if (controller.formKeyGuru.currentState!
-                                .validate()) {
-                              await controller.addMurid();
-                            }
-                          },
-                          popupTitle: 'Add New',
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal:
-                                          MediaQuery.of(context).size.width *
-                                              0.05),
-                                  child: SingleChildScrollView(
-                                    child: Form(
-                                      key: controller.formKeyGuru,
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                namaField(context),
-                                                usernameField(context),
-                                                passwordField(context),
-                                                alamat(context),
-                                                emailField(context),
-                                                teleponField(context),
-                                                kelaminField(context),
-                                                tanggalMasukField(context),
-                                                agamaField(context),
-                                              ],
+              Visibility(
+                visible: !controller.userGuru.isNotEmpty,
+                child: BtnWidget(
+                  radius: 4,
+                  height: 40,
+                  btnColor: kBrownGoldColorSecondary,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 2,
+                      blurRadius: 2,
+                    )
+                  ],
+                  icon: Icon(Icons.add),
+                  onPress: () {
+                    showFloatingModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          controller.clearTextEditingControllerMurid();
+                          return ModalPopUp(
+                            onPressed: () async {
+                              if (controller.formKeyGuru.currentState!
+                                  .validate()) {
+                                await controller.addMurid();
+                              }
+                            },
+                            popupTitle: 'Add New',
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal:
+                                            MediaQuery.of(context).size.width *
+                                                0.05),
+                                    child: SingleChildScrollView(
+                                      child: Form(
+                                        key: controller.formKeyGuru,
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  namaField(context),
+                                                  usernameField(context),
+                                                  passwordField(context),
+                                                  alamat(context),
+                                                  emailField(context),
+                                                  teleponField(context),
+                                                  kelaminField(context),
+                                                  tanggalMasukField(context),
+                                                  agamaField(context),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            width: 30,
-                                          ),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                kewarganegaraanField(context),
-                                                statusDaftarField(context),
-                                                namaWaliField(context),
-                                                tanggalLahirField(context),
-                                                tempatLahirField(context),
-                                                tipePembelajaranField(context),
-                                              ],
+                                            SizedBox(
+                                              width: 30,
                                             ),
-                                          ),
-                                        ],
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  kewarganegaraanField(context),
+                                                  statusDaftarField(context),
+                                                  namaWaliField(context),
+                                                  tanggalLahirField(context),
+                                                  tempatLahirField(context),
+                                                  tipePembelajaranField(
+                                                      context),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              )
-                            ],
-                          ),
-                        );
-                      });
-                },
-                textWidget: TextWidget(
-                  text: 'Add New',
+                                )
+                              ],
+                            ),
+                          );
+                        });
+                  },
+                  textWidget: TextWidget(
+                    text: 'Add New',
+                  ),
                 ),
               )
             ],

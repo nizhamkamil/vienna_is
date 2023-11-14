@@ -22,9 +22,13 @@ dependencies:
   intl: ^0.18.1
   lottie: ^2.3.2
   modal_bottom_sheet: ^2.1.2
-  pluto_grid: ^6.0.4
+  pluto_grid: ^7.0.2
   shared_preferences: ^2.2.2
   sidebarx: ^0.16.2
+  syncfusion_flutter_calendar: ^21.1.41
+
+dependency_overrides:
+  syncfusion_flutter_core: 21.1.41
 
 dev_dependencies:
   flutter_test:

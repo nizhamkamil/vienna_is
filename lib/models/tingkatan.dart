@@ -2,7 +2,6 @@
 //
 //     final tingkatan = tingkatanFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 List<Tingkatan> tingkatanFromJson(String str) =>

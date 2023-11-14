@@ -97,6 +97,16 @@ class AppProvider extends GetConnect {
     });
   }
 
+  static Future<Ujian> addUjian(String body) async {
+    var response = await client.post(Uri.parse('$config/ujian'),
+        body: body, headers: headers);
+    if (response.statusCode == 200) {
+      return ujianSingleFromJson(response.body);
+    } else {
+      return Ujian();
+    }
+  }
+
   static Future<Uint8List> getFoto(String path) {
     print('$config/assets/$path');
     return client.get(Uri.parse('$config/assets/$path')).then((response) {
@@ -233,6 +243,16 @@ class AppProvider extends GetConnect {
     }
   }
 
+  static Future<Ujian> updateUjian(String body, int id) async {
+    var response = await client.put(Uri.parse('$config/ujian/$id'),
+        body: body, headers: headers);
+    if (response.statusCode == 200) {
+      return ujianSingleFromJson(response.body);
+    } else {
+      return Ujian();
+    }
+  }
+
   static Future<Kelas> updateKelas(
       String body, KelasKomplit kelasKomplit, RxList<XFile?> file) async {
     try {
@@ -287,6 +307,15 @@ class AppProvider extends GetConnect {
 
   static Future<String> deleteGuru(int id) async {
     var response = await client.delete(Uri.parse('$config/guru/$id'));
+    if (response.statusCode == 200) {
+      return 'SUCCESS';
+    } else {
+      return 'FAILED';
+    }
+  }
+
+  static Future<String> deleteUjian(int id) async {
+    var response = await client.delete(Uri.parse('$config/ujian/$id'));
     if (response.statusCode == 200) {
       return 'SUCCESS';
     } else {

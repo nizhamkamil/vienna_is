@@ -1,194 +1,152 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 import 'package:get/get.dart';
-import 'package:pluto_grid/pluto_grid.dart';
-import 'package:vienna_is/config/theme.dart';
-import 'package:vienna_is/controller/controller.dart';
-import 'package:vienna_is/controller/pluto_controller.dart';
 
-import '../alert_dialog_widget.dart';
+import 'package:vienna_is/view/widgets/pluto_table/tabel_ujian.dart';
+import '../../../config/theme.dart';
+import '../../../controller/controller.dart';
+import '../button.dart';
 import '../floating_modal.dart';
 import '../modal_pop_up.dart';
 import '../text.dart';
 
-class TabelUjian extends StatelessWidget {
-  TabelUjian({super.key});
+class HalamanUjianAdmin extends StatelessWidget {
+  HalamanUjianAdmin({super.key});
+
   Controller controller = Get.find();
-  PlutoController plutoController = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    List<PlutoColumn> column = [
-      PlutoColumn(
-        title: 'Id Ujian',
-        field: 'idUjian',
-        type: PlutoColumnType.number(),
-        backgroundColor: kAccentBrownGoldColor,
-        width: 50,
-      ),
-      PlutoColumn(
-        title: 'Id Guru',
-        field: 'idGuru',
-        type: PlutoColumnType.number(),
-        backgroundColor: kAccentBrownGoldColor,
-        width: 50,
-      ),
-      PlutoColumn(
-        title: 'Nama Guru',
-        field: 'namaGuru',
-        type: PlutoColumnType.text(),
-        backgroundColor: kAccentBrownGoldColor,
-      ),
-      PlutoColumn(
-        title: 'Id Murid',
-        field: 'idMurid',
-        type: PlutoColumnType.number(),
-        backgroundColor: kAccentBrownGoldColor,
-        width: 50,
-      ),
-      PlutoColumn(
-        title: 'Nama Murid',
-        field: 'namaMurid',
-        type: PlutoColumnType.text(),
-        backgroundColor: kAccentBrownGoldColor,
-      ),
-      PlutoColumn(
-        title: 'Status Ujian',
-        field: 'statusUjian',
-        type: PlutoColumnType.text(),
-        backgroundColor: kAccentBrownGoldColor,
-      ),
-      PlutoColumn(
-        title: 'Hasil Ujian',
-        field: 'hasilUjian',
-        type: PlutoColumnType.text(),
-        backgroundColor: kAccentBrownGoldColor,
-      ),
-      PlutoColumn(
-        title: 'Action',
-        field: 'action',
-        type: PlutoColumnType.text(),
-        backgroundColor: kAccentBrownGoldColor,
-        renderer: (rendererContext) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    RxBool showFilter = false.obs;
+    return Padding(
+      padding: const EdgeInsets.all(80),
+      child: Column(
+        children: [
+          TextWidget(
+            text: 'Halaman Ujian',
+            size: 24,
+            weight: FontWeight.bold,
+          ),
+          SizedBox(
+            height: 50,
+          ),
+          Row(
             children: [
-              IconButton(
-                icon: Icon(
-                  Icons.edit,
-                  color: Colors.blue,
+              Expanded(
+                flex: 1,
+                child: TextWidget(
+                  text: 'Tabel Ujian',
+                  weight: FontWeight.bold,
+                  size: 18,
                 ),
-                onPressed: () {
-                  showFloatingModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      controller.openEditUjian(rendererContext);
-                      return ModalPopUp(
-                        onPressed: () async {
-                          if (controller.formKeyGuru.currentState!.validate()) {
-                            await controller.updateUjian(
-                                rendererContext.row.cells['idUjian']!.value);
-                            plutoController.refreshPlutoTable(
-                              controller.ujianStateManager!,
-                              plutoController.getUjianRow(controller.ujianList),
-                            );
-                          }
-                        },
-                        popupTitle: 'Edit',
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal:
-                                      MediaQuery.of(context).size.width * 0.05,
-                                ),
-                                child: SingleChildScrollView(
-                                    child: Form(
-                                  key: controller.formKeyGuru,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      guruField(context),
-                                      muridField(context),
-                                      statusField(context),
-                                      hasilField(context),
-                                    ],
-                                  ),
-                                )),
-                              ),
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
               ),
-              IconButton(
-                onPressed: () {
-                  showDialog(
+              Spacer(
+                flex: 6,
+              ),
+              BtnWidget(
+                radius: 4,
+                height: 40,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 2,
+                    blurRadius: 2,
+                  )
+                ],
+                btnColor: Colors.white,
+                outlineColor: kBrownGoldColorSecondary,
+                icon: Icon(
+                  Icons.filter_alt,
+                  color: kBrownGoldColorSecondary,
+                ),
+                onPress: () {
+                  showFilter.value = !showFilter.value;
+                  controller.ujianStateManager
+                      ?.setShowColumnFilter(showFilter.value);
+                },
+                textWidget: TextWidget(
+                  text: 'Show Filter',
+                  color: kBrownGoldColorSecondary,
+                ),
+              ),
+              SizedBox(
+                width: 30,
+              ),
+              BtnWidget(
+                radius: 4,
+                height: 40,
+                btnColor: kBrownGoldColorSecondary,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 2,
+                    blurRadius: 2,
+                  )
+                ],
+                icon: Icon(Icons.add),
+                onPress: () {
+                  showFloatingModalBottomSheet(
                       context: context,
                       builder: (context) {
-                        return AlertDialogWidget(
-                          onPress: () async {
-                            await controller.deleteUjian(
-                                rendererContext.row.cells['idUjian']!.value);
-                            plutoController.refreshPlutoTable(
-                              controller.ujianStateManager!,
-                              plutoController.getUjianRow(controller.ujianList),
-                            );
+                        controller.clearTextEditingControllerUjian();
+                        return ModalPopUp(
+                          onPressed: () async {
+                            if (controller.formKeyGuru.currentState!
+                                .validate()) {
+                              await controller.addUjian();
+                            }
                           },
+                          popupTitle: 'Add New',
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          MediaQuery.of(context).size.width *
+                                              0.05),
+                                  child: SingleChildScrollView(
+                                    child: Form(
+                                      key: controller.formKeyGuru,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          guruField(context),
+                                          muridField(context),
+                                          statusField(context),
+                                          hasilField(context),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
                         );
                       });
                 },
-                icon: Icon(
-                  Icons.delete,
-                  color: Colors.red,
+                textWidget: TextWidget(
+                  text: 'Add New',
                 ),
               )
             ],
-          );
-        },
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          Expanded(
+            child: TabelUjian(),
+          )
+        ],
       ),
-    ];
-    return FutureBuilder(
-      future: controller.fetchUjian(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.hasData) {
-          return PlutoGrid(
-            mode: PlutoGridMode.readOnly,
-            columns: column,
-            rows: plutoController.getUjianRow(controller.ujianList),
-            onLoaded: (event) {
-              controller.ujianStateManager = event.stateManager;
-            },
-            configuration: PlutoGridConfiguration(
-              columnSize: PlutoGridColumnSizeConfig(
-                  autoSizeMode: PlutoAutoSizeMode.scale),
-              style: PlutoGridStyleConfig(
-                borderColor: Colors.transparent,
-                oddRowColor: kWhiteBackground,
-                gridBorderRadius: BorderRadius.all(
-                  Radius.circular(4),
-                ),
-              ),
-            ),
-            createFooter: (stateManager) {
-              stateManager.setPageSize(10, notify: false);
-              return PlutoPagination(stateManager);
-            },
-          );
-        } else {
-          return const Center(child: CircularProgressIndicator());
-        }
-      },
     );
   }
 

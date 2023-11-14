@@ -2,7 +2,6 @@
 //
 //     final kelas = kelasFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 List<Kelas> kelasFromJson(String str) =>

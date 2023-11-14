@@ -8,6 +8,7 @@ import '../models/kelas_complete.dart';
 import '../models/murid.dart';
 import '../models/pendaftaran.dart';
 import '../models/ruangan.dart';
+import '../models/ujian.dart';
 
 class PlutoController extends GetxController {
   Controller controller = Get.find();
@@ -111,6 +112,22 @@ class PlutoController extends GetxController {
             value: controller.pendaftaranList[index].tanggalPendaftaran),
         'statusPendaftaran': PlutoCell(
             value: controller.pendaftaranList[index].statusPendaftaran),
+        'action': PlutoCell(value: ''),
+      });
+    });
+  }
+
+  List<PlutoRow> getUjianRow(List<Ujian> ujian) {
+    return List.generate(controller.ujianList.length, (index) {
+      return PlutoRow(cells: {
+        'idUjian': PlutoCell(value: controller.ujianList[index].idUjian),
+        'idGuru': PlutoCell(value: controller.ujianList[index].idGuru),
+        'namaGuru': PlutoCell(value: controller.ujianList[index].namaGuru),
+        'idMurid': PlutoCell(value: controller.ujianList[index].idMurid),
+        'namaMurid': PlutoCell(value: controller.ujianList[index].namaMurid),
+        'statusUjian':
+            PlutoCell(value: controller.ujianList[index].statusUjian),
+        'hasilUjian': PlutoCell(value: controller.ujianList[index].hasilUjian),
         'action': PlutoCell(value: ''),
       });
     });

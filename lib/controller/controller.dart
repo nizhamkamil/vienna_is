@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:html';
-
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sidebarx/sidebarx.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:vienna_is/controller/pluto_controller.dart';
 import 'package:vienna_is/models/admin.dart';
 import 'package:vienna_is/models/guru.dart';
@@ -18,6 +19,7 @@ import 'package:vienna_is/models/ruangan.dart';
 import 'package:vienna_is/models/tingkatan.dart';
 import 'package:vienna_is/models/ujian.dart';
 import 'package:vienna_is/provider/provider.dart';
+import 'package:vienna_is/view/widgets/calendar_data_sourcer.dart';
 
 import '../models/murid.dart';
 import '../models/pendaftaran.dart';
@@ -126,6 +128,13 @@ class Controller extends GetxController {
   Rx<TextEditingController> tanggalPendaftaranController =
       TextEditingController().obs;
 
+  //TextEditingController Ujian
+  Rx<TextEditingController> idGuruUjianController = TextEditingController().obs;
+  Rx<TextEditingController> idMuridUjianController =
+      TextEditingController().obs;
+  Rx<TextEditingController> statusUjianController = TextEditingController().obs;
+  Rx<TextEditingController> hasilUjianController = TextEditingController().obs;
+
   //Pendaftaran ID Foreign Key
   int? idMuridPendaftaran;
   int? idKelasPendaftaran;
@@ -137,6 +146,10 @@ class Controller extends GetxController {
   int? idKelasJadwal;
   int? idTingkatanJadwal;
   int? idRuanganJadwal;
+
+  //Ujian ID Foreign Key
+  int? idGuruUjian;
+  int? idMuridUjian;
 
   //Constant
   List<DropdownMenuItem> dropdownJenisKelamin = [
@@ -200,6 +213,28 @@ class Controller extends GetxController {
     const DropdownMenuItem(
       value: 'Tidak aktif',
       child: Text('Tidak aktif'),
+    ),
+  ];
+
+  List<DropdownMenuItem> dropdownStatusUjian = [
+    const DropdownMenuItem(
+      value: 'Pending',
+      child: Text('Pending'),
+    ),
+    const DropdownMenuItem(
+      value: 'Selesai',
+      child: Text('Selesai'),
+    ),
+  ];
+
+  List<DropdownMenuItem> dropdownHasilUjian = [
+    const DropdownMenuItem(
+      value: 'Lulus',
+      child: Text('Lulus'),
+    ),
+    const DropdownMenuItem(
+      value: 'Tidak lulus',
+      child: Text('Tidak Lulus'),
     ),
   ];
 
@@ -322,6 +357,16 @@ class Controller extends GetxController {
     kewarganegaraanController.clear();
     jenisKelaminController.clear();
     statusNikahController.clear();
+  }
+
+  clearTextEditingControllerUjian() {
+    idGuruUjianController.value.clear();
+    idMuridUjianController.value.clear();
+    statusUjianController.value.clear();
+    hasilUjianController.value.clear();
+
+    idGuruUjian = null;
+    idMuridUjian = null;
   }
 
   clearTextEditingControllerKelas() {
@@ -842,7 +887,6 @@ class Controller extends GetxController {
       deskripsiRuangan: deskripsiRuanganController.text,
     );
     String jsonRequest = ruanganSingleToJson(request);
-    print(jsonRequest);
     var res = await AppProvider.updateRuangan(jsonRequest, id);
     if (res.namaRuangan != null) {
       await fetchRuangan();
@@ -1130,7 +1174,7 @@ class Controller extends GetxController {
         jsonRequest, selectedKelasKomplit, imageXFile);
 
     await fetchKelas();
-    print('imageXFile length: ${imageXFile.length}');
+
     for (var i = 0; i < imageXFile.length; i++) {
       KelasFoto requestFotoSingle = KelasFoto(
           idKelasFoto: null,
@@ -1138,7 +1182,7 @@ class Controller extends GetxController {
           pathFoto: imageXFile[i]!.name,
           idKelas: id);
       String jsonRequestFoto = kelasFotoSingleToJson(requestFotoSingle);
-      print(jsonRequestFoto);
+
       await AppProvider.addKelasFoto(jsonRequestFoto);
     }
     await fetchKelas();
@@ -1146,15 +1190,13 @@ class Controller extends GetxController {
       kelasStateManager!,
       plutoController.getKelasRow(kelasKomplitList),
     );
-    print(res.deskripsiKelas);
-    print(res.namaKelas);
-    print(res.idKelas);
+
     if (res.namaKelas != null) {
       Get.back();
       Get.snackbar(
         'Berhasil',
         'Kelas berhasil diupdate',
-        backgroundColor: Colors.green,
+        backgroundColor: Color.fromARGB(255, 181, 185, 181),
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(16),
         duration: const Duration(seconds: 3),
@@ -1242,7 +1284,7 @@ class Controller extends GetxController {
     PlutoController plutoController = Get.find();
     var res = await AppProvider.deleteKelas(id);
     if (res == 'SUCCESS') {
-      fetchKelas();
+      await fetchKelas();
       plutoController.refreshPlutoTable(
         kelasStateManager!,
         plutoController.getKelasRow(kelasKomplitList),
@@ -1363,6 +1405,139 @@ class Controller extends GetxController {
 
   //!END PENDAFTARAN
 
+  //!START UJIAN
+
+  openEditUjian(PlutoColumnRendererContext rendererContext) async {
+    idMuridUjianController.value.text =
+        rendererContext.row.cells['namaMurid']!.value.toString();
+    idGuruUjianController.value.text =
+        rendererContext.row.cells['namaGuru']!.value.toString();
+    idGuruUjian = rendererContext.row.cells['idGuru']!.value;
+    idMuridUjian = rendererContext.row.cells['idMurid']!.value;
+    statusUjianController.value.text =
+        rendererContext.row.cells['statusUjian']!.value.toString();
+    hasilUjianController.value.text =
+        rendererContext.row.cells['hasilUjian']!.value.toString();
+  }
+
+  Future<Ujian> addUjian() async {
+    PlutoController plutoController = Get.find();
+    Ujian request = Ujian(
+      idUjian: null,
+      idMurid: idMuridUjian,
+      idGuru: idGuruUjian,
+      statusUjian: statusUjianController.value.text,
+      hasilUjian: hasilUjianController.value.text,
+    );
+
+    var res = await AppProvider.addUjian(ujianSingleToJson(request));
+    if (res.idGuru != null) {
+      await fetchUjian();
+      plutoController.refreshPlutoTable(
+        ujianStateManager!,
+        plutoController.getUjianRow(ujianList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Ujian berhasil ditambahkan',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Ujian gagal ditambahkan',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+    }
+    return res;
+  }
+
+  Future<Ujian> updateUjian(int id) async {
+    PlutoController plutoController = Get.find();
+    Ujian request = Ujian(
+      idUjian: null,
+      idMurid: idMuridUjian,
+      idGuru: idGuruUjian,
+      statusUjian: statusUjianController.value.text,
+      hasilUjian: hasilUjianController.value.text,
+    );
+
+    var res = await AppProvider.updateUjian(ujianSingleToJson(request), id);
+    if (res.idGuru != null) {
+      await fetchUjian();
+      plutoController.refreshPlutoTable(
+        ujianStateManager!,
+        plutoController.getUjianRow(ujianList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Ujian berhasil diupdate',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Ujian gagal diupdate',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+    }
+    return res;
+  }
+
+  Future<String> deleteUjian(int id) async {
+    PlutoController plutoController = Get.find();
+    var res = await AppProvider.deleteUjian(id);
+    if (res == 'SUCCESS') {
+      await fetchUjian();
+      plutoController.refreshPlutoTable(
+        ujianStateManager!,
+        plutoController.getUjianRow(ujianList),
+      );
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Ujian berhasil dihapus',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+      return 'SUCCESS';
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Ujian gagal dihapus',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+      return 'FAILED';
+    }
+  }
+
+  //!END UJIAN
+
   logout() async {
     Future<SharedPreferences> preferences = SharedPreferences.getInstance();
     SharedPreferences prefs = await preferences;
@@ -1421,14 +1596,14 @@ class Controller extends GetxController {
 
   Future<List<Jadwal>> fetchJadwal() async {
     var res = await AppProvider.getAllJadwal();
-    print('get jadwal');
+
     jadwalList.value = res;
     return res;
   }
 
   Future<List<Pendaftaran>> fetchPendaftaran() async {
     var res = await AppProvider.getAllPendaftaran();
-    print('get pendaftaran');
+
     pendaftaranList.value = res;
     return res;
   }
@@ -1491,5 +1666,44 @@ class Controller extends GetxController {
       return fixedDate.add(Duration(hours: hour, minutes: minute));
     }
     return fixedDate; // Return a default date if the input is invalid
+  }
+
+  getCalendarDataSource() {
+    List<Appointment> appointments = <Appointment>[];
+    Random random = Random();
+
+    for (var i = 0; i < jadwalList.length; i++) {
+      appointments.add(Appointment(
+          startTime: DateTime.now().add(Duration(
+            hours: jadwalList[i].jamMulai!.hour,
+            minutes: jadwalList[i].jamMulai!.minute,
+          )),
+          endTime: DateTime.now().add(Duration(
+            hours: jadwalList[i].jamSelesai!.hour,
+            minutes: jadwalList[i].jamSelesai!.minute,
+          )),
+          subject: 'Kelas : ${jadwalList[i].namaKelas ?? ''}',
+          color: Color.fromARGB(255, random.nextInt(256), random.nextInt(256),
+              random.nextInt(256)),
+          recurrenceRule: SfCalendar.generateRRule(
+            RecurrenceProperties(
+                startDate: DateTime.now(),
+                recurrenceType: RecurrenceType.weekly,
+                recurrenceRange: RecurrenceRange.count,
+                recurrenceCount: 20,
+                weekDays: [
+                  WeekDays.monday,
+                  WeekDays.tuesday,
+                  WeekDays.wednesday,
+                  WeekDays.thursday,
+                  WeekDays.friday,
+                  WeekDays.saturday,
+                  WeekDays.sunday
+                ]),
+            jadwalList[i].jamMulai!,
+            jadwalList[i].jamSelesai!,
+          )));
+    }
+    return DataSource(appointments);
   }
 }

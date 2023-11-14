@@ -1,23 +1,51 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, must_be_immutable
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
-import 'package:vienna_is/view/widgets/pluto_table/tabel_murid.dart';
-import '../../../config/theme.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../../controller/controller.dart';
-import '../button.dart';
-import '../floating_modal.dart';
-import '../modal_pop_up.dart';
 import '../text.dart';
-import '../text_form_field_widget.dart';
 
 class HalamanJadwal extends StatelessWidget {
-  const HalamanJadwal({super.key});
+  HalamanJadwal({super.key});
+
+  Controller controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Padding(
+      padding: EdgeInsets.all(80),
+      child: Column(
+        children: [
+          TextWidget(
+            text: 'Halaman Jadwal',
+            size: 24,
+            weight: FontWeight.bold,
+          ),
+          SizedBox(
+            height: 50,
+          ),
+          Expanded(
+            child: FutureBuilder(
+              future: controller.fetchJadwal(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Obx(() => SfCalendar(
+                        view: CalendarView.week,
+                        dataSource: controller.getCalendarDataSource(),
+                      ));
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
