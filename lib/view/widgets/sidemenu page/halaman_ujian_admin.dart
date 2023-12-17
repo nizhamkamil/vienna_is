@@ -76,65 +76,68 @@ class HalamanUjianAdmin extends StatelessWidget {
               SizedBox(
                 width: 30,
               ),
-              BtnWidget(
-                radius: 4,
-                height: 40,
-                btnColor: kBrownGoldColorSecondary,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 2,
-                    blurRadius: 2,
-                  )
-                ],
-                icon: Icon(Icons.add),
-                onPress: () {
-                  showFloatingModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        controller.clearTextEditingControllerUjian();
-                        return ModalPopUp(
-                          onPressed: () async {
-                            if (controller.formKeyGuru.currentState!
-                                .validate()) {
-                              await controller.addUjian();
-                            }
-                          },
-                          popupTitle: 'Add New',
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal:
-                                          MediaQuery.of(context).size.width *
-                                              0.05),
-                                  child: SingleChildScrollView(
-                                    child: Form(
-                                      key: controller.formKeyGuru,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          guruField(context),
-                                          muridField(context),
-                                          statusField(context),
-                                          hasilField(context),
-                                        ],
+              Visibility(
+                visible: controller.userAdmin.value.idAdmin != null,
+                child: BtnWidget(
+                  radius: 4,
+                  height: 40,
+                  btnColor: kBrownGoldColorSecondary,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 2,
+                      blurRadius: 2,
+                    )
+                  ],
+                  icon: Icon(Icons.add),
+                  onPress: () {
+                    showFloatingModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          controller.clearTextEditingControllerUjian();
+                          return ModalPopUp(
+                            onPressed: () async {
+                              if (controller.formKeyGuru.currentState!
+                                  .validate()) {
+                                await controller.addUjian();
+                              }
+                            },
+                            popupTitle: 'Add New',
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal:
+                                            MediaQuery.of(context).size.width *
+                                                0.05),
+                                    child: SingleChildScrollView(
+                                      child: Form(
+                                        key: controller.formKeyGuru,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            guruField(context),
+                                            muridField(context),
+                                            statusField(context),
+                                            hasilField(context),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              )
-                            ],
-                          ),
-                        );
-                      });
-                },
-                textWidget: TextWidget(
-                  text: 'Add New',
+                                )
+                              ],
+                            ),
+                          );
+                        });
+                  },
+                  textWidget: TextWidget(
+                    text: 'Add New',
+                  ),
                 ),
               )
             ],

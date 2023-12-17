@@ -8,7 +8,9 @@ import 'package:vienna_is/view/widgets/text.dart';
 
 import '../../../config/theme.dart';
 import '../../../controller/controller.dart';
+import '../../pages/detail_page.dart';
 import '../button.dart';
+import '../floating_modal.dart';
 
 class HalamanUtama extends StatelessWidget {
   HalamanUtama({super.key});
@@ -30,10 +32,10 @@ class HalamanUtama extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             child: TextWidget(
               text: controller.role.value == 'Guru'
-                  ? 'Selamat Datang Kembali,  ${controller.userGuru[0].nama}'
+                  ? 'Selamat Datang  ${controller.userGuru[0].nama ?? ''}'
                   : controller.role.value == 'Murid'
-                      ? 'Selamat Datang Kembali,  ${controller.userMurid[0].nama}'
-                      : 'Selamat Datang Kembali,  ${controller.userAdmin.value.nama!}',
+                      ? 'Selamat Datang  ${controller.userMurid[0].nama ?? ''}'
+                      : 'Selamat Datang  ${controller.userAdmin.value.nama ?? ''}',
               size: 24,
               weight: FontWeight.bold,
             ),
@@ -103,7 +105,19 @@ class HalamanUtama extends StatelessWidget {
                                 height: 40,
                                 radius: 4,
                                 btnColor: kBrownColor,
-                                onPress: () {},
+                                onPress: () async {
+                                  await controller.fetchKelas();
+                                  await controller
+                                      .openDetailKelas(element.idKelas);
+                                  showFloatingModalBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return DetailPage(
+                                          id: element.idKelas,
+                                          kelasKomplit: element,
+                                        );
+                                      });
+                                },
                                 textWidget: TextWidget(text: 'Lihat Kelas'),
                               )),
                             ],

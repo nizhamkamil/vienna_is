@@ -182,7 +182,9 @@ class TabelMurid extends StatelessWidget {
     ];
 
     return FutureBuilder(
-        future: controller.fetchMurid(),
+        future: controller.userGuru.isEmpty
+            ? controller.fetchMurid()
+            : controller.fetchMuridByIdGuru(controller.userGuru[0].idGuru!),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.hasData) {

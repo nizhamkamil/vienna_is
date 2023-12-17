@@ -5,9 +5,11 @@ import 'package:get/get.dart';
 import 'package:getwidget/components/card/gf_card.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:vienna_is/config/theme.dart';
+import 'package:vienna_is/view/pages/detail_page.dart';
 
 import 'package:vienna_is/view/widgets/appbar_widget.dart';
 import 'package:vienna_is/view/widgets/button.dart';
+import 'package:vienna_is/view/widgets/floating_modal.dart';
 import 'package:vienna_is/view/widgets/text.dart';
 
 import '../../controller/controller.dart';
@@ -159,7 +161,7 @@ class LandingPage extends StatelessWidget {
                                   child: TextWidget(
                                     text: controller
                                         .kelasKomplitList[index].deskripsiKelas,
-                                    maxLines: 20,
+                                    maxLines: 5,
                                     textAlign: TextAlign.justify,
                                   ),
                                 ),
@@ -174,7 +176,23 @@ class LandingPage extends StatelessWidget {
                                     height: 40,
                                     radius: 4,
                                     btnColor: kBrownColor,
-                                    onPress: () {},
+                                    onPress: () async {
+                                      await controller.fetchKelas();
+                                      await controller.openDetailKelas(
+                                          controller
+                                              .kelasKomplitList[index].idKelas);
+                                      showFloatingModalBottomSheet(
+                                          context: context,
+                                          builder: (context) {
+                                            return DetailPage(
+                                              id: controller
+                                                  .kelasKomplitList[index]
+                                                  .idKelas,
+                                              kelasKomplit: controller
+                                                  .kelasKomplitList[index],
+                                            );
+                                          });
+                                    },
                                     textWidget: TextWidget(text: 'Lihat Kelas'),
                                   )),
                                 ],

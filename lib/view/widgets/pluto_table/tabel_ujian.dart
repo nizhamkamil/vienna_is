@@ -70,99 +70,117 @@ class TabelUjian extends StatelessWidget {
       PlutoColumn(
         title: 'Action',
         field: 'action',
+        hide: controller.userAdmin.value.idAdmin == null ? true : false,
         type: PlutoColumnType.text(),
         backgroundColor: kAccentBrownGoldColor,
         renderer: (rendererContext) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                icon: Icon(
-                  Icons.edit,
-                  color: Colors.blue,
-                ),
-                onPressed: () {
-                  showFloatingModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      controller.openEditUjian(rendererContext);
-                      return ModalPopUp(
-                        onPressed: () async {
-                          if (controller.formKeyGuru.currentState!.validate()) {
-                            await controller.updateUjian(
-                                rendererContext.row.cells['idUjian']!.value);
-                            plutoController.refreshPlutoTable(
-                              controller.ujianStateManager!,
-                              plutoController.getUjianRow(controller.ujianList),
-                            );
-                          }
-                        },
-                        popupTitle: 'Edit',
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal:
-                                      MediaQuery.of(context).size.width * 0.05,
-                                ),
-                                child: SingleChildScrollView(
-                                    child: Form(
-                                  key: controller.formKeyGuru,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      guruField(context),
-                                      muridField(context),
-                                      statusField(context),
-                                      hasilField(context),
-                                    ],
-                                  ),
-                                )),
-                              ),
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-              IconButton(
-                onPressed: () {
-                  showDialog(
+          return Visibility(
+            visible: controller.userAdmin.value.idAdmin == null ? false : true,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.edit,
+                    color: Colors.blue,
+                  ),
+                  onPressed: () {
+                    showFloatingModalBottomSheet(
                       context: context,
                       builder: (context) {
-                        return AlertDialogWidget(
-                          onPress: () async {
-                            await controller.deleteUjian(
-                                rendererContext.row.cells['idUjian']!.value);
-                            plutoController.refreshPlutoTable(
-                              controller.ujianStateManager!,
-                              plutoController.getUjianRow(controller.ujianList),
-                            );
+                        controller.openEditUjian(rendererContext);
+                        return ModalPopUp(
+                          onPressed: () async {
+                            if (controller.formKeyGuru.currentState!
+                                .validate()) {
+                              await controller.updateUjian(
+                                  rendererContext.row.cells['idUjian']!.value);
+                              plutoController.refreshPlutoTable(
+                                controller.ujianStateManager!,
+                                plutoController
+                                    .getUjianRow(controller.ujianList),
+                              );
+                            }
                           },
+                          popupTitle: 'Edit',
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal:
+                                        MediaQuery.of(context).size.width *
+                                            0.05,
+                                  ),
+                                  child: SingleChildScrollView(
+                                      child: Form(
+                                    key: controller.formKeyGuru,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        guruField(context),
+                                        muridField(context),
+                                        statusField(context),
+                                        hasilField(context),
+                                      ],
+                                    ),
+                                  )),
+                                ),
+                              )
+                            ],
+                          ),
                         );
-                      });
-                },
-                icon: Icon(
-                  Icons.delete,
-                  color: Colors.red,
+                      },
+                    );
+                  },
                 ),
-              )
-            ],
+                IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialogWidget(
+                            onPress: () async {
+                              await controller.deleteUjian(
+                                  rendererContext.row.cells['idUjian']!.value);
+                              plutoController.refreshPlutoTable(
+                                controller.ujianStateManager!,
+                                plutoController
+                                    .getUjianRow(controller.ujianList),
+                              );
+                            },
+                          );
+                        });
+                  },
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  ),
+                )
+              ],
+            ),
           );
         },
       ),
     ];
     return FutureBuilder(
-      future: controller.fetchUjian(),
+      future: controller.userMurid.isNotEmpty
+          ? controller.fetchUjianByIdMurid(controller.userMurid[0].idMurid!)
+          : controller.userGuru.isNotEmpty
+              ? controller.fetchUjianByIdGuru(controller.userGuru[0].idGuru!)
+              : controller.fetchUjian(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {
           return PlutoGrid(
+            noRowsWidget: Center(
+              child: TextWidget(
+                text: 'Anda tidak memiliki data ujian',
+              ),
+            ),
             mode: PlutoGridMode.readOnly,
             columns: column,
             rows: plutoController.getUjianRow(controller.ujianList),

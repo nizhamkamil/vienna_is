@@ -97,6 +97,18 @@ class AppProvider extends GetConnect {
     });
   }
 
+  static Future<Pendaftaran> addPendaftaran(String body) {
+    return client
+        .post(Uri.parse('$config/pendaftaran'), body: body, headers: headers)
+        .then((response) {
+      if (response.statusCode == 200) {
+        return pendaftaranSingleFromJson(response.body);
+      } else {
+        return Pendaftaran();
+      }
+    });
+  }
+
   static Future<Ujian> addUjian(String body) async {
     var response = await client.post(Uri.parse('$config/ujian'),
         body: body, headers: headers);
@@ -387,6 +399,15 @@ class AppProvider extends GetConnect {
     }
   }
 
+  static Future<List<Murid>> getAllMuridByIdGuru(int id) async {
+    var response = await client.get(Uri.parse('$config/murid/$id'));
+    if (response.statusCode == 200) {
+      return muridFromJson(response.body);
+    } else {
+      return <Murid>[];
+    }
+  }
+
   static Future<List<Guru>> getAllGuru() async {
     var response = await client.get(Uri.parse('$config/guru'));
 
@@ -416,6 +437,24 @@ class AppProvider extends GetConnect {
     }
   }
 
+  static Future<List<Ujian>> getAllUjianByIdGuru(int id) async {
+    var response = await client.get(Uri.parse('$config/ujian/guru/$id'));
+    if (response.statusCode == 200) {
+      return ujianFromJson(response.body);
+    } else {
+      return <Ujian>[];
+    }
+  }
+
+  static Future<List<Ujian>> getAllUjianByIdMurid(int id) async {
+    var response = await client.get(Uri.parse('$config/ujian/murid/$id'));
+    if (response.statusCode == 200) {
+      return ujianFromJson(response.body);
+    } else {
+      return <Ujian>[];
+    }
+  }
+
   static Future<List<Ruangan>> getAllRuangan() async {
     var response = await client.get(Uri.parse('$config/ruangan'));
     if (response.statusCode == 200) {
@@ -425,9 +464,32 @@ class AppProvider extends GetConnect {
     }
   }
 
+  static Future<List<Jadwal>> getAllJadwalMurid(int id) async {
+    var response =
+        await client.get(Uri.parse('$config/jadwal_pembelajaran/murid/$id'));
+    if (response.statusCode == 200) {
+      print(response.body);
+      return jadwalFromJson(response.body);
+    } else {
+      return <Jadwal>[];
+    }
+  }
+
+  static Future<List<Jadwal>> getAllJadwalGuru(int id) async {
+    var response =
+        await client.get(Uri.parse('$config/jadwal_pembelajaran/guru/$id'));
+    if (response.statusCode == 200) {
+      print(response.body);
+      return jadwalFromJson(response.body);
+    } else {
+      return <Jadwal>[];
+    }
+  }
+
   static Future<List<Jadwal>> getAllJadwal() async {
     var response = await client.get(Uri.parse('$config/jadwal_pembelajaran'));
     if (response.statusCode == 200) {
+      print(response.body);
       return jadwalFromJson(response.body);
     } else {
       return <Jadwal>[];

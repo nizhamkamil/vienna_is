@@ -39,10 +39,10 @@ class HalamanUtamaAdmin extends StatelessWidget {
                   padding: const EdgeInsets.all(20),
                   child: TextWidget(
                     text: controller.role.value == 'Guru'
-                        ? 'Selamat Datang Kembali,  ${controller.userGuru[0].nama}'
+                        ? 'Selamat Datang ${controller.userGuru[0].nama ?? ''}'
                         : controller.role.value == 'Murid'
-                            ? 'Selamat Datang Kembali,  ${controller.userMurid[0].nama}'
-                            : 'Selamat Datang Kembali,  ${controller.userAdmin.value.nama!}',
+                            ? 'Selamat Datang  ${controller.userMurid[0].nama ?? ''}'
+                            : 'Selamat Datang  ${controller.userAdmin.value.nama ?? ''}',
                     size: 24,
                     weight: FontWeight.bold,
                   ),

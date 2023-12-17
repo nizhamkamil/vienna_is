@@ -134,9 +134,9 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                         weight: FontWeight.bold,
                         size: 16,
                         text: controller.role.value == 'Guru'
-                            ? controller.userGuru[0].nama!
+                            ? controller.userGuru[0].nama ?? ''
                             : controller.role.value == 'Murid'
-                                ? controller.userMurid[0].nama!
+                                ? controller.userMurid[0].nama ?? ''
                                 : controller.userAdmin.value.nama ?? '',
                         maxLines: 4,
                       ),
@@ -178,15 +178,12 @@ class ScreenNavigation extends StatelessWidget {
               switch (sidebarXController.selectedIndex) {
                 case 0:
                   return HalamanUtama();
-
                 case 1:
                   return HalamanMurid();
-
                 case 2:
                   return HalamanJadwal();
-
                 case 3:
-                  return HalamanUjian();
+                  return HalamanUjianAdmin();
                 default:
                   return Center(child: TextWidget(text: 'Home'));
               }
@@ -198,13 +195,12 @@ class ScreenNavigation extends StatelessWidget {
               switch (sidebarXController.selectedIndex) {
                 case 0:
                   return HalamanUtama();
-
                 case 1:
                   return HalamanJadwal();
                 case 2:
                   return HalamanPendaftaran();
                 case 3:
-                  return HalamanUjian();
+                  return HalamanUjianAdmin();
                 default:
                   return Center(child: TextWidget(text: 'Home'));
               }
@@ -256,7 +252,7 @@ class ScreenNavigation extends StatelessWidget {
           case 6:
             return HalamanPendaftaran();
           case 7:
-            return HalamanUjian();
+            return HalamanUjianAdmin();
           default:
             return Center(child: TextWidget(text: 'Home'));
         }

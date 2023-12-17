@@ -91,6 +91,13 @@ class Controller extends GetxController {
   TextEditingController tipePembelajaranMuridController =
       TextEditingController();
 
+  //TextEditingController Register
+  TextEditingController usernameRegisterController = TextEditingController();
+  TextEditingController passwordRegisterController = TextEditingController();
+  TextEditingController confirmPasswordRegisterController =
+      TextEditingController();
+  TextEditingController emailRegisterController = TextEditingController();
+
   //TextEditingController Ruangan
   TextEditingController namaRuanganController = TextEditingController();
   TextEditingController deskripsiRuanganController = TextEditingController();
@@ -452,6 +459,55 @@ class Controller extends GetxController {
     return res;
   }
 
+  Future<Murid> createMurid() async {
+    Murid request = Murid(
+      idMurid: null,
+      username: usernameRegisterController.text,
+      password: passwordRegisterController.text,
+      email: emailRegisterController.text,
+    );
+    String jsonRequest = muridSingleToJson(request);
+    print(jsonRequest);
+    if (passwordRegisterController.text ==
+        confirmPasswordRegisterController.text) {
+      var res = await AppProvider.addMurid(jsonRequest);
+      if (res.username != null) {
+        Get.snackbar(
+          'Berhasil',
+          'Murid berhasil ditambahkan',
+          backgroundColor: Colors.green,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 2),
+          colorText: Colors.white,
+        );
+        Get.toNamed('/login');
+      } else {
+        Get.snackbar(
+          'Gagal',
+          'Murid gagal ditambahkan',
+          backgroundColor: Colors.red,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 2),
+          colorText: Colors.white,
+        );
+      }
+      return res;
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Password tidak sama',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+      return Murid();
+    }
+  }
+
   Future<Murid> addMurid() async {
     PlutoController plutoController = Get.find();
     Murid request = Murid(
@@ -514,6 +570,12 @@ class Controller extends GetxController {
     return res;
   }
 
+  Future<List<Murid>> fetchMuridByIdGuru(int id) async {
+    var res = await AppProvider.getAllMuridByIdGuru(id);
+    muridList.value = res;
+    return res;
+  }
+
   Future<Murid> updateMurid(int id) async {
     PlutoController plutoController = Get.find();
     Murid request = Murid(
@@ -559,6 +621,57 @@ class Controller extends GetxController {
       Get.snackbar(
         'Gagal',
         'Murid gagal diupdate',
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+    }
+    return res;
+  }
+
+  Future<Murid> daftarMurid(int id, {bool updateTable = true}) async {
+    Murid request = Murid(
+      idMurid: null,
+      nama: namaMuridController.text,
+      username: userMurid[0].username,
+      password: userMurid[0].password,
+      alamat: alamatMuridController.text,
+      email: emailMuridController.text,
+      noTelepon: noTeleponMuridController.text,
+      agama: agamaMuridController.text,
+      kewarganegaraan: kewarganegaraanMuridController.text,
+      jenisKelamin: jenisKelaminMuridController.text,
+      tanggalMasuk: DateTime.now(),
+      statusDaftar: 'Tidak aktif',
+      namaWali: namaWaliMuridController.text,
+      tanggalLahir: convertYearMonthDayToDateTime(
+          tanggalLahirMuridController.text.toString()),
+      tempatLahir: tempatLahirMuridController.text,
+      tipePembelajaran: tipePembelajaranMuridController.text,
+    );
+    String jsonRequest = muridSingleToJson(request);
+    print(jsonRequest);
+    var res = await AppProvider.updateMurid(jsonRequest, id);
+    await addPendaftaran(userMurid[0].idMurid!);
+    if (res.username != null) {
+      clearTextEditingControllerMurid();
+      await fetchMurid();
+      Get.back();
+      Get.snackbar(
+        'Berhasil',
+        'Anda telah mendaftarkan diri sebagai murid baru',
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'Gagal',
+        'Gagal daftar',
         backgroundColor: Colors.red,
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(16),
@@ -1150,12 +1263,22 @@ class Controller extends GetxController {
     for (var i = 0; i < res.length; i++) {
       final bodyBytes = await AppProvider.getFoto(res[i].pathFoto!);
       var singleXFile = XFile.fromData(bodyBytes, name: res[i].pathFoto!);
-      print(singleXFile.name);
+
       imageXFile.add(singleXFile);
     }
-    print('baiklah');
     for (var i = 0; i < imageXFile.length; i++) {
       print(imageXFile[i]!.name);
+    }
+  }
+
+  openDetailKelas(int id) async {
+    imageXFile.clear();
+    var res = await fetchKelasFotoById(id);
+    for (var i = 0; i < res.length; i++) {
+      final bodyBytes = await AppProvider.getFoto(res[i].pathFoto!);
+      var singleXFile = XFile.fromData(bodyBytes, name: res[i].pathFoto!);
+      print(singleXFile.name);
+      imageXFile.add(singleXFile);
     }
   }
 
@@ -1327,13 +1450,29 @@ class Controller extends GetxController {
         rendererContext.row.cells['statusPendaftaran']!.value.toString();
   }
 
+  Future<Pendaftaran> addPendaftaran(int idMurid) async {
+    Pendaftaran request = Pendaftaran(
+      idPendaftaran: null,
+      idMurid: idMurid,
+      idKelas: idKelasJadwal,
+      idAdmin: 1,
+      tanggalPendaftaran: DateTime.now(),
+      statusPendaftaran: 'Tidak aktif',
+    );
+
+    String jsonRequest = pendaftaranSingleToJson(request);
+    print(jsonRequest);
+    var res = await AppProvider.addPendaftaran(jsonRequest);
+    return res;
+  }
+
   Future<Pendaftaran> updatePendaftaran(int id) async {
     PlutoController plutoController = Get.find();
     Pendaftaran request = Pendaftaran(
       idPendaftaran: null,
       idMurid: idMuridPendaftaran,
       idKelas: idKelasPendaftaran,
-      idAdmin: idAdminPendaftaran,
+      idAdmin: userAdmin.value.idAdmin,
       statusPendaftaran: statusPendaftaranController.value.text,
     );
     String jsonRequest = pendaftaranSingleToJson(request);
@@ -1406,6 +1545,18 @@ class Controller extends GetxController {
   //!END PENDAFTARAN
 
   //!START UJIAN
+
+  Future<List<Ujian>> fetchUjianByIdGuru(int id) async {
+    var res = await AppProvider.getAllUjianByIdGuru(id);
+    ujianList.value = res;
+    return res;
+  }
+
+  Future<List<Ujian>> fetchUjianByIdMurid(int id) async {
+    var res = await AppProvider.getAllUjianByIdMurid(id);
+    ujianList.value = res;
+    return res;
+  }
 
   openEditUjian(PlutoColumnRendererContext rendererContext) async {
     idMuridUjianController.value.text =
@@ -1601,6 +1752,20 @@ class Controller extends GetxController {
     return res;
   }
 
+  Future<List<Jadwal>> fetchJadwalByIdMurid() async {
+    var res = await AppProvider.getAllJadwalMurid(userMurid[0].idMurid!);
+
+    jadwalList.value = res;
+    return res;
+  }
+
+  Future<List<Jadwal>> fetchJadwalByIdGuru() async {
+    var res = await AppProvider.getAllJadwalGuru(userGuru[0].idGuru!);
+
+    jadwalList.value = res;
+    return res;
+  }
+
   Future<List<Pendaftaran>> fetchPendaftaran() async {
     var res = await AppProvider.getAllPendaftaran();
 
@@ -1673,37 +1838,60 @@ class Controller extends GetxController {
     Random random = Random();
 
     for (var i = 0; i < jadwalList.length; i++) {
+      String days = '';
+      switch (jadwalList[i].hari) {
+        case 'Senin':
+          days = 'MO';
+          break;
+        case 'Selasa':
+          days = 'TU';
+          break;
+        case 'Rabu':
+          days = 'WE';
+          break;
+        case 'Kamis':
+          days = 'TH';
+          break;
+        case 'Jumat':
+          days = 'FR';
+          break;
+        case 'Sabtu':
+          days = 'SA';
+          break;
+        case 'Minggu':
+          days = 'SU';
+          break;
+        default:
+      }
+      print(days);
       appointments.add(Appointment(
-          startTime: DateTime.now().add(Duration(
-            hours: jadwalList[i].jamMulai!.hour,
-            minutes: jadwalList[i].jamMulai!.minute,
-          )),
-          endTime: DateTime.now().add(Duration(
-            hours: jadwalList[i].jamSelesai!.hour,
-            minutes: jadwalList[i].jamSelesai!.minute,
-          )),
-          subject: 'Kelas : ${jadwalList[i].namaKelas ?? ''}',
-          color: Color.fromARGB(255, random.nextInt(256), random.nextInt(256),
-              random.nextInt(256)),
-          recurrenceRule: SfCalendar.generateRRule(
-            RecurrenceProperties(
-                startDate: DateTime.now(),
-                recurrenceType: RecurrenceType.weekly,
-                recurrenceRange: RecurrenceRange.count,
-                recurrenceCount: 20,
-                weekDays: [
-                  WeekDays.monday,
-                  WeekDays.tuesday,
-                  WeekDays.wednesday,
-                  WeekDays.thursday,
-                  WeekDays.friday,
-                  WeekDays.saturday,
-                  WeekDays.sunday
-                ]),
-            jadwalList[i].jamMulai!,
-            jadwalList[i].jamSelesai!,
-          )));
+          startTime: DateTime(
+            DateTime.now().year,
+            DateTime.now().month,
+            DateTime.now().day,
+            jadwalList[i].jamMulai!.hour,
+            jadwalList[i].jamMulai!.minute,
+          ),
+          startTimeZone: 'SE Asia Standard Time',
+          endTimeZone: 'SE Asia Standard Time',
+          endTime: DateTime(
+            DateTime.now().year,
+            DateTime.now().month,
+            DateTime.now().day,
+            jadwalList[i].jamSelesai!.hour,
+            jadwalList[i].jamSelesai!.minute,
+          ),
+          subject:
+              'Kelas : ${jadwalList[i].namaKelas ?? ''} \nGuru : ${jadwalList[i].namaGuru ?? ''} \nMurid : ${jadwalList[i].namaMurid ?? ''}\nRuangan : ${jadwalList[i].namaRuangan ?? ''}',
+          color: Color.fromARGB(
+            255,
+            random.nextInt(256),
+            random.nextInt(256),
+            random.nextInt(256),
+          ),
+          recurrenceRule: 'FREQ=WEEKLY;INTERVAL=1;COUNT=10;BYDAY=$days'));
     }
+    print(appointments.length);
     return DataSource(appointments);
   }
 }

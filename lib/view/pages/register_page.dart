@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, must_be_immutable
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -6,12 +6,15 @@ import 'package:get/get.dart';
 import 'package:vienna_is/view/widgets/appbar_widget.dart';
 
 import '../../config/theme.dart';
+import '../../controller/controller.dart';
 import '../widgets/button.dart';
 import '../widgets/text.dart';
 import '../widgets/text_form_field_widget.dart';
 
 class RegisterPage extends StatelessWidget {
-  const RegisterPage({super.key});
+  RegisterPage({super.key});
+
+  Controller controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +73,7 @@ class RegisterPage extends StatelessWidget {
                     child: TextFormFieldWidget(
                       obscureText: false,
                       labelText: 'Username',
+                      textCtrl: controller.usernameRegisterController,
                       showLabel: true,
                       maxLines: 1,
                       hintText: 'Username',
@@ -82,6 +86,8 @@ class RegisterPage extends StatelessWidget {
                     child: TextFormFieldWidget(
                       obscureText: true,
                       labelText: 'Password',
+                      type: 'password',
+                      textCtrl: controller.passwordRegisterController,
                       showLabel: true,
                       maxLines: 1,
                       hintText: 'Password',
@@ -93,8 +99,10 @@ class RegisterPage extends StatelessWidget {
                         vertical: MediaQuery.of(context).size.height * 0.015),
                     child: TextFormFieldWidget(
                       obscureText: true,
+                      type: 'password',
                       labelText: 'Confirm password',
                       showLabel: true,
+                      textCtrl: controller.confirmPasswordRegisterController,
                       maxLines: 1,
                       hintText: 'Confirm password',
                     ),
@@ -121,8 +129,8 @@ class RegisterPage extends StatelessWidget {
                         height: 40,
                         radius: 4,
                         btnColor: kBrownColor,
-                        onPress: () {
-                          Get.toNamed('/home');
+                        onPress: () async {
+                          await controller.createMurid();
                         },
                         textWidget: TextWidget(
                           text: 'Register',

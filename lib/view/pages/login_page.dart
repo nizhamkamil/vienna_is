@@ -14,10 +14,8 @@ class LoginPage extends StatelessWidget {
   LoginPage({super.key});
   RxInt? loginValue = 0.obs;
   Controller controller = Get.find<Controller>();
-  TextEditingController usernameController =
-      TextEditingController(text: 'admin1');
-  TextEditingController passwordController =
-      TextEditingController(text: 'admin1');
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
