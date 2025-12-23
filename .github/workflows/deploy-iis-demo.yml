@@ -25,6 +25,25 @@ jobs:
         with:
           channel: stable
 
+      - name: Debug identity + flutter
+        shell: cmd
+        run: |
+          echo WHOAMI:
+          whoami
+          echo WHERE FLUTTER:
+          where flutter
+          flutter --version
+
+      - name: Test symlink permission
+        shell: cmd
+        run: |
+          cd /d %TEMP%
+          rmdir /s /q symlink_test 2>nul
+          mkdir symlink_test
+          cd symlink_test
+          echo hi>target.txt
+          mklink link.txt target.txt
+
       - name: Pub get
         run: flutter pub get
 
