@@ -36,7 +36,7 @@ class DetailPage extends StatelessWidget {
               weight: FontWeight.bold,
             ),
             SizedBox(
-              height: 20,
+              height: 20, //ya
             ),
             Padding(
               padding: EdgeInsets.symmetric(
