@@ -12,6 +12,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Ensure bash is available (Git for Windows)
+        shell: pwsh
+        run: |
+          echo "C:\Program Files\Git\bin"     | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+          echo "C:\Program Files\Git\usr\bin" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+
+      - name: Debug bash
+        shell: pwsh
+        run: |
+          where bash
+          bash --version
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
