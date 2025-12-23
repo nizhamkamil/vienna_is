@@ -17,7 +17,7 @@ class DetailPage extends StatelessWidget {
   final int id;
   final KelasKomplit? kelasKomplit;
   Controller controller = Get.find();
-  CarouselController carouselController = CarouselController();
+  CarouselSliderController carouselController = CarouselSliderController();
 
   @override
   Widget build(BuildContext context) {

@@ -1,0 +1,40 @@
+name: Deploy Flutter Web to IIS (DEMO)
+
+on:
+  push:
+    branches: ["master"]
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, windows]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Pub get
+        run: flutter pub get
+
+      - name: Build web (release) for /ERF_dev/
+        run: flutter build web --release --base-href /ERF_dev/
+
+      - name: Deploy to IIS ERF_dev folder
+        shell: pwsh
+        run: |
+          $sitePath  = "D:\Build web test CICD"   # <-- CHANGE THIS
+          $buildPath = Join-Path $env:GITHUB_WORKSPACE "build\web"
+
+          if (!(Test-Path $sitePath))  { throw "IIS path not found: $sitePath" }
+          if (!(Test-Path $buildPath)) { throw "Build output not found: $buildPath" }
+
+          $offline = Join-Path $sitePath "app_offline.htm"
+          "Deploying demo... please refresh in a moment." | Out-File -Encoding utf8 $offline
+
+          robocopy $buildPath $sitePath /MIR /R:2 /W:2
+
+          Remove-Item $offline -ErrorAction SilentlyContinue

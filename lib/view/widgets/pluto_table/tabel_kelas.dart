@@ -21,7 +21,7 @@ class TabelKelas extends StatelessWidget {
 
   Controller controller = Get.find();
   PlutoController plutoController = Get.find();
-  CarouselController carouselController = CarouselController();
+  CarouselSliderController carouselController = CarouselSliderController();
 
   @override
   Widget build(BuildContext context) {
@@ -237,7 +237,7 @@ class TabelKelas extends StatelessWidget {
   }
 
   Widget imageList(
-      BuildContext context, CarouselController carouselController) {
+      BuildContext context, CarouselSliderController carouselController) {
     return Obx(() => Column(
           children: [
             controller.imageXFile.isEmpty

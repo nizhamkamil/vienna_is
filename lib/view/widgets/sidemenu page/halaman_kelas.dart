@@ -19,7 +19,8 @@ class HalamanKelas extends StatelessWidget {
   HalamanKelas({super.key});
 
   Controller controller = Get.find();
-  CarouselController carouselController = CarouselController();
+  CarouselSliderController carouselSliderController =
+      CarouselSliderController();
 
   @override
   Widget build(BuildContext context) {
@@ -138,8 +139,8 @@ class HalamanKelas extends StatelessWidget {
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
                                           children: [
-                                            imageList(
-                                                context, carouselController),
+                                            imageList(context,
+                                                carouselSliderController),
                                           ],
                                         ),
                                       ),
@@ -189,7 +190,7 @@ class HalamanKelas extends StatelessWidget {
   }
 
   Widget imageList(
-      BuildContext context, CarouselController carouselController) {
+      BuildContext context, CarouselSliderController CarouselSliderController) {
     return Obx(() => Column(
           children: [
             controller.imageXFile.isEmpty
@@ -232,7 +233,7 @@ class HalamanKelas extends StatelessWidget {
                               controller.imageIndex.refresh();
                             },
                           ),
-                          carouselController: carouselController,
+                          carouselController: CarouselSliderController,
                         ),
                         Obx(() {
                           return Visibility(
@@ -245,8 +246,8 @@ class HalamanKelas extends StatelessWidget {
                                   .map((entry) {
                                 return GestureDetector(
                                     onTap: () {
-                                      carouselController
-                                          .animateToPage(entry.key);
+                                      CarouselSliderController.animateToPage(
+                                          entry.key);
                                       controller.imageIndex.refresh();
                                     },
                                     child: Container(
